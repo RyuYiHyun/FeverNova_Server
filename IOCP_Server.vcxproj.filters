@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{f644766d-524b-4aed-90c3-47dca859f1fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{75e2bee0-5c69-4a88-a82b-f1de777f62ec}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainManager.cpp" />
+    <ClCompile Include="Packet.cpp" />
+    <ClCompile Include="ProtocolExtension.cpp" />
+    <ClCompile Include="Session.cpp" />
+    <ClCompile Include="SessionManager.cpp" />
+    <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="LogManager.cpp" />
+    <ClCompile Include="LoginState.cpp" />
+    <ClCompile Include="LoginManager.cpp" />
+    <ClCompile Include="LockGuard.cpp" />
+    <ClCompile Include="IOCP.cpp" />
+    <ClCompile Include="Global.cpp" />
+    <ClCompile Include="DataBaseManager.cpp" />
+    <ClCompile Include="ConsoleControlHandler.cpp" />
+    <ClCompile Include="TestManager.cpp" />
+    <ClCompile Include="TestState.cpp" />
+    <ClCompile Include="Util.cpp" />
+    <ClCompile Include="MyStream.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="State.h" />
+    <ClInclude Include="LogManager.h" />
+    <ClInclude Include="MainManager.h" />
+    <ClInclude Include="Packet.h" />
+    <ClInclude Include="ProtocolExtension.h" />
+    <ClInclude Include="Session.h" />
+    <ClInclude Include="SessionManager.h" />
+    <ClInclude Include="Socket.h" />
+    <ClInclude Include="LoginState.h" />
+    <ClInclude Include="LoginManager.h" />
+    <ClInclude Include="LockGuard.h" />
+    <ClInclude Include="IOCP.h" />
+    <ClInclude Include="Global.h" />
+    <ClInclude Include="DataBaseManager.h" />
+    <ClInclude Include="ConsoleControlHandler.h" />
+    <ClInclude Include="TestManager.h" />
+    <ClInclude Include="TestState.h" />
+    <ClInclude Include="Util.h" />
+    <ClInclude Include="MyStream.h" />
+    <ClInclude Include="MemoryPool.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+</Project>
