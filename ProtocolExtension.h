@@ -1,12 +1,13 @@
 #pragma once
+#include "Global.h"
 class ProtocolExtension
 {
 public:
 	enum class E_AREA
 	{
-		MAIN = 8 * 3, // 메인 정보
-		SUB1 = 8 * 2, // 송신 정보 (STC 서버가 클라에게 , CTS 클라가 서버에게)
-		SUB2 = 8 * 1, // 
+		MAIN = 8 * 3,
+		SUB1 = 8 * 2,
+		SUB2 = 8 * 1,
 		SUB3 = 8 * 0
 	};
 	/// <summary>

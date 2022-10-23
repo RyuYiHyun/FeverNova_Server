@@ -1,6 +1,6 @@
 #include "TestState.h"
 #include "LogManager.h"
-#include "GameManager.h"
+#include "TestManager.h"
 void TestState::OnRecv()
 {
 	// Test 상태에서의 Recv 프로세스

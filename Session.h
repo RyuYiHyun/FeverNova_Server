@@ -23,17 +23,14 @@ public:
 	
 	void SetIdNumber(int _idNumber);
 	int GetIdNumber();
-	void* GetRoom();
-	void SetRoom(void* _room);
-
 private:
 	//void* m_loginInfo;
 
 	
 	int m_idNumber;
-	void* m_room;
 
 	State* m_state;
+
 	/* Session이 가지는 State를 추가 */
 	//LoginState* m_loginState;
 	TestState* m_testState;
