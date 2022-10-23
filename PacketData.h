@@ -130,4 +130,16 @@ struct NpcAttackData
 	int m_index;
 	int m_targetID;
 };
+
+struct NpcHPData
+{
+	NpcHPData() {}
+	NpcHPData(int _objectID, int _currentHP)
+	{
+		m_objectID = _objectID;
+		m_currentHP = _currentHP;
+	}
+	int m_objectID;
+	int m_currentHP;
+};
 #pragma pack(pop)

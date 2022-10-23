@@ -45,6 +45,7 @@ public:
 		NPC_SPAWN,
 		NPC_TRANSFORM,
 		ITEM_SPAWN,
+		NPC_HP,
 
 		//KJB_PROTOCOL
 		NPC_TRIGGER,
@@ -66,6 +67,7 @@ public:
 	void ItemSpawnProcess(Session* _session);
 	void NpcTriggerProcess(Session* _session);
 	void NpcAttackProcess(Session* _session);
+	void NpcHPProcess(Session* _session);
 
 	void ExitProcess(Session* _session);
 	void ForceExitProcess(Session* _session);
@@ -83,6 +85,7 @@ public:
 	int ItemSpawnDataMake(BYTE* _data, SpawnData_Item _SpawnData_Item);
 	int NpcTriggerDataMake(BYTE* _data, NpcTriggerData _npcTriggerData);
 	int NpcAttackDataMake(BYTE* _data, NpcAttackData _npcTriggerData);
+	int NpcHPDataMake(BYTE* _data, NpcHPData _NpcHPData);
 
 	int ExitDataMake(BYTE* _data, int _id);
 	// unpacking
@@ -91,10 +94,10 @@ public:
 	void NpcSpawnDataSplit(BYTE* _data, SpawnData_NPC& _SpawnData_npc);
 	void NpcTransformDataSplit(BYTE* _data, TransformData_NPC& _TransformData_npc);
 	void ItemSpawnDataSplit(BYTE* _data, SpawnData_Item& _SpawnData_Item);
+	void NpcHPDataSplit(BYTE* _data, NpcHPData& _NpcHPData);
 #pragma endregion
 private:
 	CriticalKey m_criticalKey;
 	int m_giveIdCounter;
 	list<Session*> m_playerList;
 };
-

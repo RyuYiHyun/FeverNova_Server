@@ -87,11 +87,14 @@ void GameManager::Function(Session* _session)
 	case GameManager::E_PROTOCOL::ITEM_SPAWN:
 		ItemSpawnProcess(_session);
 		break;
-	case  GameManager::E_PROTOCOL::NPC_TRIGGER:
+	case GameManager::E_PROTOCOL::NPC_TRIGGER:
 		NpcTriggerProcess(_session);
 		break;
-	case  GameManager::E_PROTOCOL::NPC_ATTACK:
+	case GameManager::E_PROTOCOL::NPC_ATTACK:
 		NpcAttackProcess(_session);
+		break;
+	case GameManager::E_PROTOCOL::NPC_HP:
+		NpcHPProcess(_session);
 		break;
 	case GameManager::E_PROTOCOL::EXIT:
 		ExitProcess(_session);
@@ -457,6 +460,34 @@ void GameManager::NpcAttackProcess(Session* _session)
 	return;
 }
 
+void GameManager::NpcHPProcess(Session* _session)
+{
+	LockGuard l_lockGuard(&m_criticalKey);
+	BYTE l_data[BUFSIZE];
+	ZeroMemory(l_data, BUFSIZE);
+	int l_dataSize = -1;
+
+	NpcHPData HPData_NPC;
+	NpcHPDataSplit(_session->GetDataField(), HPData_NPC);
+
+	l_dataSize = NpcHPDataMake(l_data, HPData_NPC);
+
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+	if (room == nullptr) { return; }// ¿¹¿Ü
+
+	for (auto player : room->players)
+	{
+		if (_session != player)
+		{
+			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::NPC_HP), l_dataSize, l_data))
+			{
+				LogManager::GetInstance()->LogWrite(1006);
+			}
+			break;
+		}
+	}
+}
+
 void GameManager::ExitProcess(Session* _session)
 {
 	BYTE l_data[BUFSIZE];
@@ -672,6 +703,15 @@ int GameManager::NpcAttackDataMake(BYTE* _data, NpcAttackData _npcAttackData)
 	return l_stream->GetLength();
 }
 
+int GameManager::NpcHPDataMake(BYTE* _data, NpcHPData _NpcHPData)
+{
+	MyStream l_stream;
+	l_stream->SetStream(_data);
+	l_stream->WriteBytes(reinterpret_cast<BYTE*>(&_NpcHPData), sizeof(NpcHPData));
+
+	return l_stream->GetLength();
+}
+
 int GameManager::ExitDataMake(BYTE* _data, int _id)
 {
 	MyStream l_stream;
@@ -719,4 +759,11 @@ void GameManager::ItemSpawnDataSplit(BYTE* _data, SpawnData_Item& _SpawnData_Ite
 	MyStream l_stream;
 	l_stream->SetStream(_data);
 	l_stream->ReadBytes(reinterpret_cast<BYTE*>(&_SpawnData_Item), sizeof(SpawnData_Item));
+}
+
+void GameManager::NpcHPDataSplit(BYTE* _data, NpcHPData& _NpcHPData)
+{
+	MyStream l_stream;
+	l_stream->SetStream(_data);
+	l_stream->ReadBytes(reinterpret_cast<BYTE*>(&_NpcHPData), sizeof(NpcHPData));
 }
