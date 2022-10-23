@@ -25,16 +25,7 @@ void TestManager::DestroyInstance()
 }
 bool TestManager::Initialize() // 초기화
 {
-	m_giveIdCounter = 10;
-
-#pragma region 태스트용
-	//TestList.push_back(TestListData(101, 85, 15.125f));
-	//TestList.push_back(TestListData(111, 185, 915.125f));
-	//TestList.push_back(TestListData(121, 285, 815.125f));
-	//TestList.push_back(TestListData(131, 385, 115.125f));
-#pragma endregion
-
-	
+	m_giveIdCounter = 1;
 	return true;
 }
 void TestManager::Release() // 후처리
@@ -129,8 +120,6 @@ void TestManager::SpawnProcess(Session* _session)
 			LogManager::GetInstance()->LogWrite(1005);
 		}
 	}
-
-
 	return;
 }
 
@@ -325,10 +314,6 @@ int TestManager::IdDataMake(BYTE* _data, int _id)
 	l_stream->WriteInt(_id);
 
 	return l_stream->GetLength();
-	/*int l_packedSize = 0;
-	BYTE* l_focusPointer = _data;
-	l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_packedSize, _id);
-	return l_packedSize;*/
 }
 
 int TestManager::SpawnDataMake(BYTE* _data)
@@ -344,29 +329,6 @@ int TestManager::SpawnDataMake(BYTE* _data)
 	}
 
 	return l_stream->GetLength();
-	
-
-	/*int l_packedSize = 0;
-	BYTE* l_focusPointer = _data;
-	int counter = 5;
-	l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_packedSize, static_cast<int>(m_playerList.size()));
-	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
-	{
-		l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_packedSize, (*iter)->GetIdNumber());
-		counter--;
-	}
-
-	while (counter > 0)
-	{
-		l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_packedSize, -1);
-		counter--;
-		if (counter <= 0)
-		{
-			break;
-		}
-	}
-
-	return l_packedSize;*/
 }
 
 int TestManager::MoveDataMake(BYTE* _data, MoveData _moveData)
@@ -378,13 +340,6 @@ int TestManager::MoveDataMake(BYTE* _data, MoveData _moveData)
 	l_stream->WriteBytes(reinterpret_cast<BYTE*>(&_moveData), sizeof(MoveData));
 
 	return l_stream->GetLength();
-
-	/*int l_packedSize = 0;
-	BYTE* l_focusPointer = _data;
-
-	l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_packedSize, _moveData);
-
-	return l_packedSize;*/
 }
 
 int TestManager::JumpDataMake(BYTE* _data, int _id)
@@ -422,29 +377,26 @@ int TestManager::ExitDataMake(BYTE* _data, int _id)
 	l_stream->WriteInt(_id);
 
 	return l_stream->GetLength();
-	/*int l_packedSize = 0;
-	BYTE* l_focusPointer = _data;
-
-	l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_packedSize, _id);
-
-	return l_packedSize;*/
 }
 
 
 void TestManager::MoveDataSplit(BYTE* _data, MoveData& _moveData)
 {
-	BYTE* l_focusPointer = _data;
-
-	memcpy(&_moveData, l_focusPointer, sizeof(MoveData));
-	l_focusPointer = l_focusPointer + sizeof(MoveData);
+	MyStream l_stream;
+	l_stream->SetStream(_data);
+	l_stream->ReadBytes(reinterpret_cast<BYTE*>(& _moveData), sizeof(MoveData));
 }
 
 void TestManager::FireDataSplit(BYTE* _data, FireData& _fireData)
 {
+	MyStream l_stream;
+	l_stream->SetStream(_data);
+	l_stream->ReadBytes(reinterpret_cast<BYTE*>(&_fireData), sizeof(FireData));
+	/*
 	BYTE* l_focusPointer = _data;
 
 	memcpy(&_fireData, l_focusPointer, sizeof(FireData));
-	l_focusPointer = l_focusPointer + sizeof(FireData);
+	l_focusPointer = l_focusPointer + sizeof(FireData);*/
 }
 
 
