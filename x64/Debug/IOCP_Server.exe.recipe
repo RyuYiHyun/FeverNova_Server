@@ -2,18 +2,18 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>E:\KoreaIt\Github Clone\FeverNova_Server\x64\Debug\IOCP_Server.exe</FullPath>
+      <FullPath>D:\gameprg3B\Unity\fork\FeverNova_Server\x64\Debug\IOCP_Server.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles>
     <ContentFile>
-      <FullPath>E:\KoreaIt\Github Clone\FeverNova_Server\ProtocolExtension.cpp</FullPath>
+      <FullPath>D:\gameprg3B\Unity\fork\FeverNova_Server\ProtocolExtension.cpp</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>E:\KoreaIt\Github Clone\FeverNova_Server\ConsoleControlHandler.h</FullPath>
+      <FullPath>D:\gameprg3B\Unity\fork\FeverNova_Server\ConsoleControlHandler.h</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>E:\KoreaIt\Github Clone\FeverNova_Server\DataBaseManager.h</FullPath>
+      <FullPath>D:\gameprg3B\Unity\fork\FeverNova_Server\DataBaseManager.h</FullPath>
     </ContentFile>
   </ContentFiles>
   <SatelliteDlls />

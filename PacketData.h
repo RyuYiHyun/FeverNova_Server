@@ -8,13 +8,13 @@ struct Vector2
 
 struct Vector3
 {
-	Vector3() { X = 0; Y = 0; Z = 0; }
+	Vector3(){ X = 0; Y = 0; Z = 0; }
 	Vector3(float _X, float _Y, float _Z) { X = _X; Y = _Y; Z = _Z; }
 	float X; float Y; float Z;
 };
 struct Quaternion
 {
-	Quaternion() { X = 0; Y = 0; Z = 0; W = 0; }
+	Quaternion(){ X = 0; Y = 0; Z = 0; W = 0; }
 	Quaternion(float _X, float _Y, float _Z, float _W) { X = _X; Y = _Y; Z = _Z; W = _W; }
 	float X; float Y; float Z; float W;
 };
@@ -58,43 +58,37 @@ struct FireData
 	float m_currentMosueRadius;
 };
 
-struct SpawnData_NPC
+struct NpcTriggerData
 {
-	SpawnData_NPC() {}
-	SpawnData_NPC(int _objectID, int _monsterID, Vector3 _position)
+	NpcTriggerData(){}
+	NpcTriggerData(int _objectID) { m_objectID = _objectID, m_flag = -1; }
+	void CopyData(NpcTriggerData _Src)
 	{
-		m_objectID = _objectID;
-		m_monsterID = _monsterID;
-		m_position = _position;
+		m_objectID = _Src.m_objectID;
+		m_flag = _Src.m_flag;
 	}
 	int m_objectID;
-	int m_monsterID;
-	Vector3 m_position;
+	int m_flag;
 };
 
-struct TransformData_NPC
+struct NpcAttackData
 {
-	TransformData_NPC() {}
-	TransformData_NPC(int _objectID, Vector3 _position, Quaternion _rotation)
+	NpcAttackData() {}
+	void CopyData(NpcAttackData _Src)
 	{
-		m_objectID = _objectID;
-		m_position = _position;
-		m_rotation = _rotation;
+		m_objectID = _Src.m_objectID;
+		m_position = _Src.m_position;
+		m_rotation = _Src.m_rotation;
+		m_index = _Src.m_index;
+		m_targetID = _Src.m_targetID;
 	}
+
 	int m_objectID;
 	Vector3 m_position;
 	Quaternion m_rotation;
+
+	int m_index;
+	int m_targetID;
 };
 
-struct SpawnData_Item
-{
-	SpawnData_Item() {}
-	SpawnData_Item(int _itemID, Vector3 _position)
-	{
-		m_itemID = _itemID;
-		m_position = _position;
-	}
-	int m_itemID;
-	Vector3 m_position;
-};
 #pragma pack(pop)

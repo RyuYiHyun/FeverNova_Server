@@ -1,2 +1,8 @@
-﻿  TestManager.cpp
-  IOCP_Server.vcxproj -> E:\KoreaIt\Github Clone\FeverNova_Server\x64\Debug\IOCP_Server.exe
+﻿  MainManager.cpp
+D:\gameprg3B\Unity\fork\FeverNova_Server\MainManager.cpp(116,15): warning C4101: 'l_clientAddress' :참조되지 않은 지역 변수입니다.
+  TestManager.cpp
+  TestState.cpp
+  코드를 생성하고 있습니다...
+D:\gameprg3B\Unity\fork\FeverNova_Server\MainManager.cpp(163): warning C4715: 'MainManager::RecvProcess': 모든 제어 경로에서 값을 반환하지는 않습니다.
+D:\gameprg3B\Unity\fork\FeverNova_Server\MainManager.cpp(204): warning C4715: 'MainManager::AcceptProcess': 모든 제어 경로에서 값을 반환하지는 않습니다.
+  IOCP_Server.vcxproj -> D:\gameprg3B\Unity\fork\FeverNova_Server\x64\Debug\IOCP_Server.exe
