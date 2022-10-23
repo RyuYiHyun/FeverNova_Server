@@ -20,7 +20,7 @@ private:
 public:
 	list<Room*> roomlist;
 public:
-	Room* CreateRoom(Room::Type _type = Room::Type::Single);
+	Room* CreateRoom(Room::Type _type);
 	Room* FindEmptyRoom();
 	void OutCheck(Session* player);
 	void RemoveRoom(Room* target);

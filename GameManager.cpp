@@ -1,7 +1,7 @@
 #include "GameManager.h"
 #include "LogManager.h"
 #include "SessionManager.h"
-#include "RoomManager.h"
+
 //
 #pragma region Singleton
 bool GameManager::CreateInstance()
@@ -94,7 +94,7 @@ void GameManager::IdCreateProcess(Session* _session)
 	l_dataSize = IdDataMake(l_data, m_giveIdCounter);
 	m_playerList.push_back(_session);
 	m_giveIdCounter++;
-	
+
 	if (!_session->SendPacket(static_cast<int>(E_PROTOCOL::IDCREATE), l_dataSize, l_data))
 	{
 		LogManager::GetInstance()->LogWrite(1005);
@@ -113,12 +113,16 @@ void GameManager::PlayTypeProcess(Session* _session)
 
 	int select;
 	l_stream->ReadInt(&select);
-	
+
 	if (select == 1)   // 1P
 	{
 		Room* room = RoomManager::GetInstance()->CreateRoom(Room::Type::Single);
 		room->enterPlayer(_session);
 		// 게임 시작 메세지
+		if (!room->players[0]->SendPacket(static_cast<int>(E_PROTOCOL::SINGLE_START), l_dataSize, l_data))
+		{
+			LogManager::GetInstance()->LogWrite(1005);
+		}
 	}
 	else if (select == 2) // 2P
 	{
@@ -129,11 +133,23 @@ void GameManager::PlayTypeProcess(Session* _session)
 			room = RoomManager::GetInstance()->CreateRoom(Room::Type::Multi);
 			room->enterPlayer(_session);
 			// 게임 대기..................
+			if (!room->players[0]->SendPacket(static_cast<int>(E_PROTOCOL::WAIT), l_dataSize, l_data))
+			{
+				LogManager::GetInstance()->LogWrite(1005);
+			}
 		}
 		else
 		{
 			room->enterPlayer(_session);
 			// 게임 시작..................
+			if (!room->players[0]->SendPacket(static_cast<int>(E_PROTOCOL::MULTI_HOST_START), l_dataSize, l_data))
+			{
+				LogManager::GetInstance()->LogWrite(1005);
+			}
+			if (!room->players[1]->SendPacket(static_cast<int>(E_PROTOCOL::MULTI_GUEST_START), l_dataSize, l_data))
+			{
+				LogManager::GetInstance()->LogWrite(1005);
+			}
 		}
 	}
 	return;
@@ -146,13 +162,12 @@ void GameManager::SpawnProcess(Session* _session)
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
 
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+	l_dataSize = SpawnDataMake(l_data, room);
 
-	m_MoveDataList.insert(make_pair(_session, MoveData(_session->GetIdNumber())));
-	l_dataSize = SpawnDataMake(l_data);
-
-	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
+	for (auto player : room->players)
 	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::SPAWN), l_dataSize, l_data))
+		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::SPAWN), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1005);
 		}
@@ -169,16 +184,14 @@ void GameManager::MoveProcess(Session* _session)
 
 	MoveData moveData;
 	MoveDataSplit(_session->GetDataField(), moveData);
-	//
-	// 이동 가능한 움직임인지 체크 하는 부분??? 
-	//
-	m_MoveDataList.find(_session)->second.CopyData(moveData);
-	
+
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+
 	l_dataSize = MoveDataMake(l_data, moveData);
 
-	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
+	for (auto player : room->players)
 	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::MOVE), l_dataSize, l_data))
+		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::MOVE), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
@@ -202,9 +215,11 @@ void GameManager::JumpProcess(Session* _session)
 
 	l_dataSize = JumpDataMake(l_data, idData);
 
-	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+
+	for (auto player : room->players)
 	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::JUMP), l_dataSize, l_data))
+		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::JUMP), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
@@ -228,9 +243,11 @@ void GameManager::DodgeProcess(Session* _session)
 
 	l_dataSize = DodgeDataMake(l_data, idData);
 
-	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+
+	for (auto player : room->players)
 	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::DODGE), l_dataSize, l_data))
+		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::DODGE), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
@@ -250,9 +267,11 @@ void GameManager::FireProcess(Session* _session)
 
 	l_dataSize = FireDataMake(l_data, fireData);
 
-	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+
+	for (auto player : room->players)
 	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::FIRE), l_dataSize, l_data))
+		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::FIRE), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
@@ -270,22 +289,23 @@ void GameManager::ExitProcess(Session* _session)
 
 	l_dataSize = ExitDataMake(l_data, _session->GetIdNumber());
 
-	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+	
+	for (auto player : room->players)
 	{
-		if ((*iter) == _session)
+		if (player == _session)
 		{
-			if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
+			RoomManager::GetInstance()->OutCheck(_session);
+			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
 			{
 				LogManager::GetInstance()->LogWrite(1006);
 			}
 		}
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::LEAVE), l_dataSize, l_data))
+		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::LEAVE), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
 	}
-
-	m_MoveDataList.erase(_session);
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); )
 	{
@@ -312,22 +332,23 @@ void GameManager::ForceExitProcess(Session* _session)
 
 	l_dataSize = ExitDataMake(l_data, _session->GetIdNumber());
 
-	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+
+	for (auto player : room->players)
 	{
-		if ((*iter) == _session)
+		if (player == _session)
 		{
-			if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
+			RoomManager::GetInstance()->OutCheck(_session);
+			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
 			{
 				LogManager::GetInstance()->LogWrite(1006);
 			}
 		}
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::LEAVE), l_dataSize, l_data))
+		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::LEAVE), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
 	}
-
-	m_MoveDataList.erase(_session);
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); )
 	{
@@ -353,16 +374,16 @@ int GameManager::IdDataMake(BYTE* _data, int _id)
 	return l_stream->GetLength();
 }
 
-int GameManager::SpawnDataMake(BYTE* _data)
+int GameManager::SpawnDataMake(BYTE* _data, Room* _room)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);
 
 	l_stream->WriteInt(static_cast<int>(m_playerList.size()));
 
-	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
+	for (auto player : _room->players)
 	{
-		l_stream->WriteInt((*iter)->GetIdNumber());
+		l_stream->WriteInt(player->GetIdNumber());
 	}
 
 	return l_stream->GetLength();
@@ -421,7 +442,7 @@ void GameManager::MoveDataSplit(BYTE* _data, MoveData& _moveData)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);
-	l_stream->ReadBytes(reinterpret_cast<BYTE*>(& _moveData), sizeof(MoveData));
+	l_stream->ReadBytes(reinterpret_cast<BYTE*>(&_moveData), sizeof(MoveData));
 }
 
 void GameManager::FireDataSplit(BYTE* _data, FireData& _fireData)

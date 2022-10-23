@@ -4,7 +4,7 @@
 #include "Session.h"
 #include "SessionManager.h"
 #include "PacketData.h"
-#include <map>
+#include "RoomManager.h"
 class GameManager
 {
 #pragma region Singleton
@@ -60,7 +60,7 @@ public:
 #pragma region Packing&Unpacking
 	// packing
 	int IdDataMake(BYTE* _data, int _id);
-	int SpawnDataMake(BYTE* _data);
+	int SpawnDataMake(BYTE* _data, Room* _room);
 	int MoveDataMake(BYTE* _data, MoveData _moveData);
 	int JumpDataMake(BYTE* _data, int _id);
 	int DodgeDataMake(BYTE* _data, int _id);
@@ -76,7 +76,6 @@ private:
 	CriticalKey m_criticalKey;
 	int m_giveIdCounter;
 	list<Session*> m_playerList;
-	map<Session*, MoveData> m_MoveDataList;
 	// 플레이어 정보 - 세션
 	// 몬스터 정보 - 무관
 	// 지형 정보 - 무관

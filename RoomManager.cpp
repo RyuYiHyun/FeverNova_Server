@@ -60,9 +60,9 @@ RoomManager* RoomManager::m_instance = nullptr;	// Singleton 按眉
 #pragma endregion
 
 
-Room* RoomManager::CreateRoom()
+Room* RoomManager::CreateRoom(Room::Type _type = Room::Type::Single)
 {
-	Room* newRoom = new Room();	// 规 积己
+	Room* newRoom = new Room(_type);	// 规 积己
 	roomlist.push_back(newRoom); // 规 府胶飘俊 沥焊 眠啊
 	return newRoom;
 }
@@ -71,11 +71,12 @@ Room* RoomManager::FindEmptyRoom()
 {
 	for (auto room : roomlist)
 	{
-		if (!room->isfull)
+		if (!room->isfull && room->type == Room::Type::Multi)
 		{
 			return room;
 		}
 	}
+	return nullptr;
 }
 
 void RoomManager::OutCheck(Session* player)
