@@ -414,10 +414,10 @@ int GameManager::SpawnDataMake(BYTE* _data, Room& _room)
 	MyStream l_stream;
 	l_stream->SetStream(_data);
 
-	l_stream->WriteInt(static_cast<int>(m_playerList.size()));
-
+	l_stream->WriteInt(static_cast<int>(_room.players.size()));
 	for (auto player : _room.players)
 	{
+		LogManager::GetInstance()->LogWrite(player->GetIdNumber());
 		l_stream->WriteInt(player->GetIdNumber());
 	}
 
