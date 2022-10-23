@@ -24,16 +24,15 @@ private:
 public:
 	enum class E_PROTOCOL
 	{
-		// �ʱ� �ʿ� ��
-		CRYPTOKEY,		// �ʱ� �Ϻ�ȣȭŰ ���� ��ȣ
-		IDCREATE,		// ���̵� ����
+		CRYPTOKEY,
+		IDCREATE,
 
-		PLAYTYPE,		// ��Ƽ or �̱� ����
-		WAIT,			// ��Ƽ ���
-		SINGLE_START,			// �̱� ����
-		MULTI_HOST_START,		// ȣ��Ʈ(��ü) ����
-		MULTI_GUEST_START,		// �Խ�Ʈ(����) ����
-		
+		PLAYTYPE,
+		WAIT,
+		SINGLE_START,
+		MULTI_HOST_START,
+		MULTI_GUEST_START,
+
 		SPAWN,
 		MOVE,
 		JUMP,
@@ -41,39 +40,11 @@ public:
 		FIRE,
 		LEAVE,
 		EXIT,
-		STC_IDCREATE,
-		CTS_IDCREATE,
-
-		STC_SPAWN,
-		CTS_SPAWN,
-
-		STC_MOVE,
-		CTS_MOVE,
-
-		STC_JUMP,
-		CTS_JUMP,
-
-		STC_DODGE,
-		CTS_DODGE,
-
-		STC_FIRE,
-		CTS_FIRE,
-
-		STC_OUT,
-		CTS_OUT,
-
-		STC_EXIT,
-		CTS_EXIT,
-
-		Test,
 
 		//JUNYOUNG_PROTOCOL
-		STC_NPC_SPAWN,
-		CTS_NPC_SPAWN,
-		STC_NPC_TRANSFORM,
-		CTS_NPC_TRANSFORM,
-		STC_ITEM_SPAWN,
-		CTS_ITEM_SPAWN,
+		NPC_SPAWN,
+		NPC_TRANSFORM,
+		ITEM_SPAWN,
 	};
 
 	void Function(Session* _session);
@@ -117,8 +88,5 @@ private:
 	CriticalKey m_criticalKey;
 	int m_giveIdCounter;
 	list<Session*> m_playerList;
-	// �÷��̾� ���� - ����
-	// ���� ���� - ����
-	// ���� ���� - ����
 };
 
