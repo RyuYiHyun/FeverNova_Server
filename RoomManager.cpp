@@ -58,3 +58,73 @@ RoomManager::~RoomManager()
 
 RoomManager* RoomManager::m_instance = nullptr;	// Singleton 객체
 #pragma endregion
+
+
+Room* RoomManager::CreateRoom()
+{
+	Room* newRoom = new Room();	// 방 생성
+	roomlist.push_back(newRoom); // 방 리스트에 정보 추가
+	return newRoom;
+}
+
+Room* RoomManager::FindEmptyRoom()
+{
+	for (auto room : roomlist)
+	{
+		if (!room->isfull)
+		{
+			return room;
+		}
+	}
+}
+
+void RoomManager::OutCheck(Session* player)
+{
+	Room* room = reinterpret_cast<Room*>(player->GetRoom());
+	if (room != nullptr) // 클라이언트가 종료할때 , 방정보를 가지고 있으면
+	{
+		if (room->state == Room::State::WAITSTART)// 방에 혼자 대기중이면 방을 삭제
+		{
+			room->exitPlayer(player);
+			RemoveRoom(room);
+		}
+		if (room->state == Room::State::SINGLEPLAY) // 게임중일때
+		{
+			room->exitPlayer(player);
+			RemoveRoom(room);
+		}
+		if (room->state == Room::State::MULTIPLAY) // 게임중일때
+		{
+			room->exitPlayer(player);
+			RemoveRoom(room);
+		}
+		if (room->state == Room::State::ENDGAME) // 게임이 종료
+		{
+			room->exitPlayer(player);
+			RemoveRoom(room);
+		}
+	}
+}
+
+void RoomManager::RemoveRoom(Room* target)
+{
+	if (target == nullptr) // 삭제할 방이 없으면
+	{
+		return;
+	}
+	if (target->players.empty())// 빈방이면 삭제
+	{
+		for (list<Room*>::iterator iter = roomlist.begin(); iter != roomlist.end(); )
+		{
+			if (target == (*iter))
+			{
+				delete (*iter);
+				iter = roomlist.erase(iter);
+			}
+			else
+			{
+				iter++;
+			}
+		}
+	}
+}

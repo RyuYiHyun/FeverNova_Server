@@ -161,7 +161,7 @@
     <ClCompile Include="SessionManager.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="MyStream.cpp" />
-    <ClCompile Include="TestManager.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="TestState.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
@@ -190,7 +190,7 @@
     <ClInclude Include="Socket.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="MyStream.h" />
-    <ClInclude Include="TestManager.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="TestState.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>

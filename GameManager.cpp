@@ -1,13 +1,14 @@
-#include "TestManager.h"
+#include "GameManager.h"
 #include "LogManager.h"
 #include "SessionManager.h"
+#include "RoomManager.h"
 //
 #pragma region Singleton
-bool TestManager::CreateInstance()
+bool GameManager::CreateInstance()
 {
 	if (m_instance == nullptr)
 	{
-		m_instance = new TestManager();
+		m_instance = new GameManager();
 		return true;
 	}
 	else
@@ -15,22 +16,22 @@ bool TestManager::CreateInstance()
 		return false;
 	}
 }
-void TestManager::DestroyInstance()
+void GameManager::DestroyInstance()
 {
 	if (m_instance != nullptr)
 	{
 		delete m_instance;
 	}
 }
-bool TestManager::Initialize() // 초기화
+bool GameManager::Initialize() // 초기화
 {
 	m_giveIdCounter = 1;
 	return true;
 }
-void TestManager::Release() // 후처리
+void GameManager::Release() // 후처리
 {
 }
-TestManager* TestManager::GetInstance()
+GameManager* GameManager::GetInstance()
 {
 	if (m_instance != nullptr)
 	{
@@ -41,41 +42,41 @@ TestManager* TestManager::GetInstance()
 		return nullptr;
 	}
 }
-TestManager::TestManager()// 생성자
+GameManager::GameManager()// 생성자
 {
 }
-TestManager::~TestManager()// 소멸자
+GameManager::~GameManager()// 소멸자
 {
 }
-TestManager* TestManager::m_instance = nullptr;	// Singleton 객체
+GameManager* GameManager::m_instance = nullptr;	// Singleton 객체
 #pragma endregion
 
 
-void TestManager::Function(Session* _session)
+void GameManager::Function(Session* _session)
 {
 	E_PROTOCOL l_protocol = static_cast<E_PROTOCOL>(_session->GetProtocol());
 	switch (l_protocol)
 	{
-	case TestManager::E_PROTOCOL::IDCREATE:
+	case GameManager::E_PROTOCOL::IDCREATE:
 		IdCreateProcess(_session);
 		break;
 
-	case TestManager::E_PROTOCOL::SPAWN:
+	case GameManager::E_PROTOCOL::SPAWN:
 		SpawnProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::MOVE:
+	case GameManager::E_PROTOCOL::MOVE:
 		MoveProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::JUMP:
+	case GameManager::E_PROTOCOL::JUMP:
 		JumpProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::DODGE:
+	case GameManager::E_PROTOCOL::DODGE:
 		DodgeProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::FIRE:
+	case GameManager::E_PROTOCOL::FIRE:
 		FireProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::EXIT:
+	case GameManager::E_PROTOCOL::EXIT:
 		ExitProcess(_session);
 		break;
 	default:
@@ -83,7 +84,7 @@ void TestManager::Function(Session* _session)
 		break;
 	}
 }
-void TestManager::IdCreateProcess(Session* _session)
+void GameManager::IdCreateProcess(Session* _session)
 {
 	LockGuard l_lockGuard(&m_criticalKey); // 잠금
 	BYTE l_data[BUFSIZE];
@@ -100,7 +101,7 @@ void TestManager::IdCreateProcess(Session* _session)
 	}
 }
 
-void TestManager::PlayTypeProcess(Session* _session)
+void GameManager::PlayTypeProcess(Session* _session)
 {
 	LockGuard l_lockGuard(&m_criticalKey); // 잠금
 	BYTE l_data[BUFSIZE];
@@ -112,42 +113,33 @@ void TestManager::PlayTypeProcess(Session* _session)
 
 	int select;
 	l_stream->ReadInt(&select);
-	if (select == 1)
-	{// 싱글 선택
-		// 새로운 방 만들어서 입장
-		int Num = m_room.size();
-		m_room[Num].isMulti = false;
-		m_room[Num].count = 1;
-		m_room
-		// 게임 시작 패킷 전송...
+	
+	if (select == 1)   // 1P
+	{
+		Room* room = RoomManager::GetInstance()->CreateRoom(Room::Type::Single);
+		room->enterPlayer(_session);
+		// 게임 시작 메세지
 	}
-	else // select == 2
-	{//멀티 선택
-		// 빈방 찾아보기
-		bool flag = false;
-		for (auto room : m_room)
+	else if (select == 2) // 2P
+	{
+		Room* room;
+		room = RoomManager::GetInstance()->FindEmptyRoom();
+		if (room == nullptr)
 		{
-			if (room.second.isMulti)
-			{
-				if (room.second.count == 1)// 1명 이하 일때
-				{
-					room.second.count = 2;
-					// 게임 시작 패킷 전송... (상대에게도)
-					flag = true;
-				}
-			}
+			room = RoomManager::GetInstance()->CreateRoom(Room::Type::Multi);
+			room->enterPlayer(_session);
+			// 게임 대기..................
 		}
-		if (!flag)
-		{// 빈방이 없으면 방만들기
-			int Num = m_room.size();
-			m_room[Num].isMulti = true;
-			m_room[Num].count = 1;
-			// 게임 대기 패킷 전송...
+		else
+		{
+			room->enterPlayer(_session);
+			// 게임 시작..................
 		}
 	}
+	return;
 }
 
-void TestManager::SpawnProcess(Session* _session)
+void GameManager::SpawnProcess(Session* _session)
 {
 	LockGuard l_lockGuard(&m_criticalKey); // 잠금
 	BYTE l_data[BUFSIZE];
@@ -168,7 +160,7 @@ void TestManager::SpawnProcess(Session* _session)
 	return;
 }
 
-void TestManager::MoveProcess(Session* _session)
+void GameManager::MoveProcess(Session* _session)
 {
 	LockGuard l_lockGuard(&m_criticalKey); // 잠금
 	BYTE l_data[BUFSIZE];
@@ -194,7 +186,7 @@ void TestManager::MoveProcess(Session* _session)
 	return;
 }
 
-void TestManager::JumpProcess(Session* _session)
+void GameManager::JumpProcess(Session* _session)
 {
 	LockGuard l_lockGuard(&m_criticalKey); // 잠금
 	BYTE l_data[BUFSIZE];
@@ -220,7 +212,7 @@ void TestManager::JumpProcess(Session* _session)
 	return;
 }
 
-void TestManager::DodgeProcess(Session* _session)
+void GameManager::DodgeProcess(Session* _session)
 {
 	LockGuard l_lockGuard(&m_criticalKey); // 잠금
 	BYTE l_data[BUFSIZE];
@@ -246,7 +238,7 @@ void TestManager::DodgeProcess(Session* _session)
 	return;
 }
 
-void TestManager::FireProcess(Session* _session)
+void GameManager::FireProcess(Session* _session)
 {
 	LockGuard l_lockGuard(&m_criticalKey); // 잠금
 	BYTE l_data[BUFSIZE];
@@ -268,7 +260,7 @@ void TestManager::FireProcess(Session* _session)
 	return;
 }
 
-void TestManager::ExitProcess(Session* _session)
+void GameManager::ExitProcess(Session* _session)
 {
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
@@ -310,7 +302,7 @@ void TestManager::ExitProcess(Session* _session)
 	return;
 }
 
-void TestManager::ForceExitProcess(Session* _session)
+void GameManager::ForceExitProcess(Session* _session)
 {
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
@@ -352,7 +344,7 @@ void TestManager::ForceExitProcess(Session* _session)
 	return;
 }
 
-int TestManager::IdDataMake(BYTE* _data, int _id)
+int GameManager::IdDataMake(BYTE* _data, int _id)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);
@@ -361,7 +353,7 @@ int TestManager::IdDataMake(BYTE* _data, int _id)
 	return l_stream->GetLength();
 }
 
-int TestManager::SpawnDataMake(BYTE* _data)
+int GameManager::SpawnDataMake(BYTE* _data)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);
@@ -376,7 +368,7 @@ int TestManager::SpawnDataMake(BYTE* _data)
 	return l_stream->GetLength();
 }
 
-int TestManager::MoveDataMake(BYTE* _data, MoveData _moveData)
+int GameManager::MoveDataMake(BYTE* _data, MoveData _moveData)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);
@@ -387,7 +379,7 @@ int TestManager::MoveDataMake(BYTE* _data, MoveData _moveData)
 	return l_stream->GetLength();
 }
 
-int TestManager::JumpDataMake(BYTE* _data, int _id)
+int GameManager::JumpDataMake(BYTE* _data, int _id)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);
@@ -396,7 +388,7 @@ int TestManager::JumpDataMake(BYTE* _data, int _id)
 	return l_stream->GetLength();
 }
 
-int TestManager::DodgeDataMake(BYTE* _data, int _id)
+int GameManager::DodgeDataMake(BYTE* _data, int _id)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);
@@ -405,7 +397,7 @@ int TestManager::DodgeDataMake(BYTE* _data, int _id)
 	return l_stream->GetLength();
 }
 
-int TestManager::FireDataMake(BYTE* _data, FireData _fireData)
+int GameManager::FireDataMake(BYTE* _data, FireData _fireData)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);
@@ -415,7 +407,7 @@ int TestManager::FireDataMake(BYTE* _data, FireData _fireData)
 	return l_stream->GetLength();
 }
 
-int TestManager::ExitDataMake(BYTE* _data, int _id)
+int GameManager::ExitDataMake(BYTE* _data, int _id)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);
@@ -425,14 +417,14 @@ int TestManager::ExitDataMake(BYTE* _data, int _id)
 }
 
 
-void TestManager::MoveDataSplit(BYTE* _data, MoveData& _moveData)
+void GameManager::MoveDataSplit(BYTE* _data, MoveData& _moveData)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);
 	l_stream->ReadBytes(reinterpret_cast<BYTE*>(& _moveData), sizeof(MoveData));
 }
 
-void TestManager::FireDataSplit(BYTE* _data, FireData& _fireData)
+void GameManager::FireDataSplit(BYTE* _data, FireData& _fireData)
 {
 	MyStream l_stream;
 	l_stream->SetStream(_data);

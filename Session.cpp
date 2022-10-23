@@ -5,11 +5,13 @@
 Session::Session() :Packet()
 {
 	m_idNumber = -1;
+	m_room = nullptr;
 	//m_loginInfo = nullptr;
 }
 Session::Session(const SOCKET& _sock) : Packet(_sock)
 {
 	m_idNumber = -1;
+	m_room = nullptr;
 	//m_loginInfo = nullptr;
 }
 //
@@ -65,8 +67,6 @@ bool Session::RecvPacket()
 bool Session::Initialize()
 {
 	//m_loginState = new LoginState(this);
-
-
 	m_testState = new TestState(this);
 	//m_state = m_loginState;
 	m_state = m_testState;

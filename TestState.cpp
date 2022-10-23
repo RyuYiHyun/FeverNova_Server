@@ -1,10 +1,10 @@
 #include "TestState.h"
 #include "LogManager.h"
-#include "TestManager.h"
+#include "GameManager.h"
 void TestState::OnRecv()
 {
 	// Test 상태에서의 Recv 프로세스
-	TestManager::GetInstance()->Function(m_session);
+	GameManager::GetInstance()->Function(m_session);
 }
 
 void TestState::OnSend()

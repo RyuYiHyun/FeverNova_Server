@@ -5,7 +5,8 @@
 #include "SessionManager.h"
 #include "DataBaseManager.h"
 #include "LogManager.h"
-#include "TestManager.h"
+#include "GameManager.h"
+#include "RoomManager.h"
 #pragma region Singleton
 bool MainManager::CreateInstance()
 {
@@ -23,14 +24,16 @@ bool MainManager::CreateInstance()
 	//DataBaseManager::CreateInstance();
 	//LoginManager::CreateInstance();
 	SessionManager::CreateInstance();
-	TestManager::CreateInstance();
+	RoomManager::CreateInstance();
+	GameManager::CreateInstance();
 	return true; // 성공적 생성
 }
 //
 void MainManager::DestroyInstance()
 {
 	// 하위 매니저 삭제
-	TestManager::DestroyInstance();
+	GameManager::DestroyInstance();
+	RoomManager::DestroyInstance();
 	SessionManager::DestroyInstance();
 	//LoginManager::DestroyInstance();
 	//DataBaseManager::DestroyInstance();
@@ -64,14 +67,14 @@ bool MainManager::Initialize()// 초기화
 	//DataBaseManager::GetInstance()->Initialize();
 	//LoginManager::GetInstance()->Initialize();
 	SessionManager::GetInstance()->Initialize();
-	TestManager::GetInstance()->Initialize();
+	GameManager::GetInstance()->Initialize();
 	return true;
 }
 //
 void MainManager::Release() // 뒤처리
 {
 	// 하위 매니저 뒷정리... (생성과 역순)
-	TestManager::GetInstance()->Release();
+	GameManager::GetInstance()->Release();
 
 	BaseStream::ReleaseAllAllocedMemory();
 
@@ -200,7 +203,7 @@ bool MainManager::AcceptProcess(SOCKET _clientSock)
 	}
 
 	// TestManager :: E_PROTOCOL :: CRYPTOKEY => 0
-	session->InitCryptoKeySend((int)TestManager::E_PROTOCOL::CRYPTOKEY);
+	session->InitCryptoKeySend((int)GameManager::E_PROTOCOL::CRYPTOKEY);
 }
 
 // 클라 연결 종료시 수행할 작업
@@ -208,6 +211,6 @@ void MainManager::DisconnectedProcess(void* _session)
 {
 	Session* session = reinterpret_cast<Session*>(_session);
 	// 로그인 메니저에서 로그인됬으면 로그인 정보 삭제
-	TestManager::GetInstance()->ForceExitProcess(session);
+	GameManager::GetInstance()->ForceExitProcess(session);
 	SessionManager::GetInstance()->DeleteSession(session);
 }

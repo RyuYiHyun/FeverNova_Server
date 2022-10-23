@@ -24,7 +24,7 @@
     <ClCompile Include="Global.cpp" />
     <ClCompile Include="DataBaseManager.cpp" />
     <ClCompile Include="ConsoleControlHandler.cpp" />
-    <ClCompile Include="TestManager.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="TestState.cpp" />
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="MyStream.cpp" />
@@ -47,7 +47,7 @@
     <ClInclude Include="Global.h" />
     <ClInclude Include="DataBaseManager.h" />
     <ClInclude Include="ConsoleControlHandler.h" />
-    <ClInclude Include="TestManager.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="TestState.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="MyStream.h" />

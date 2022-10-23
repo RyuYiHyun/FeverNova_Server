@@ -5,7 +5,7 @@
 #include "SessionManager.h"
 #include "PacketData.h"
 #include <map>
-class TestManager
+class GameManager
 {
 #pragma region Singleton
 public:
@@ -13,12 +13,12 @@ public:
 	static void DestroyInstance();
 	bool Initialize();
 	void Release();
-	static TestManager* GetInstance();
+	static GameManager* GetInstance();
 private:
-	static TestManager* m_instance;
+	static GameManager* m_instance;
 
-	TestManager();
-	virtual ~TestManager();
+	GameManager();
+	virtual ~GameManager();
 #pragma endregion
 
 public:
@@ -30,8 +30,10 @@ public:
 
 		PLAYTYPE,		// 멀티 or 싱글 선택
 		WAIT,			// 멀티 대기
-		START,			// 싱글 시작 or 멀티 2명 매칭 시작
-
+		SINGLE_START,			// 싱글 시작
+		MULTI_HOST_START,		// 호스트(주체) 시작
+		MULTI_GUEST_START,		// 게스트(의존) 시작
+		
 		SPAWN,
 		MOVE,
 		JUMP,
