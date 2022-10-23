@@ -60,7 +60,7 @@ public:
 #pragma region Packing&Unpacking
 	// packing
 	int IdDataMake(BYTE* _data, int _id);
-	int SpawnDataMake(BYTE* _data, Room* _room);
+	int SpawnDataMake(BYTE* _data, Room& _room);
 	int MoveDataMake(BYTE* _data, MoveData _moveData);
 	int JumpDataMake(BYTE* _data, int _id);
 	int DodgeDataMake(BYTE* _data, int _id);

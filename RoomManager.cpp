@@ -79,6 +79,7 @@ Room* RoomManager::FindEmptyRoom()
 	return nullptr;
 }
 
+
 void RoomManager::OutCheck(Session* player)
 {
 	Room* room = reinterpret_cast<Room*>(player->GetRoom());
