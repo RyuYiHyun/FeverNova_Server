@@ -24,38 +24,28 @@ private:
 public:
 	enum class E_PROTOCOL
 	{
-		CRYPTOKEY,		// 서버 -> 클라				:	초기 암복호화키 전송 신호
+		// 초기 필요 값
+		CRYPTOKEY,		// 초기 암복호화키 전송 신호
+		IDCREATE,		// 아이디 생성
 
-		STC_IDCREATE,
-		CTS_IDCREATE,
-		
-		STC_SPAWN,
-		CTS_SPAWN,
+		PLAYTYPE,		// 멀티 or 싱글 선택
+		WAIT,			// 멀티 대기
+		START,			// 싱글 시작 or 멀티 2명 매칭 시작
 
-		STC_MOVE,
-		CTS_MOVE,
-
-		STC_JUMP,
-		CTS_JUMP,
-
-		STC_DODGE,
-		CTS_DODGE,
-
-		STC_FIRE,
-		CTS_FIRE,
-
-		STC_OUT,
-		CTS_OUT,
-
-		STC_EXIT,
-		CTS_EXIT,
-
-		Test,
+		SPAWN,
+		MOVE,
+		JUMP,
+		DODGE,
+		FIRE,
+		LEAVE,
+		EXIT,
 	};
 
 	void Function(Session* _session);
 
 	void IdCreateProcess(Session* _session);
+	void PlayTypeProcess(Session* _session);
+
 	void SpawnProcess(Session* _session);
 	void MoveProcess(Session* _session);
 	void JumpProcess(Session* _session);

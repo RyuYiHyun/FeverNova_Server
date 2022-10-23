@@ -1,7 +1,6 @@
 #include "TestManager.h"
 #include "LogManager.h"
 #include "SessionManager.h"
-
 //
 #pragma region Singleton
 bool TestManager::CreateInstance()
@@ -57,29 +56,27 @@ void TestManager::Function(Session* _session)
 	E_PROTOCOL l_protocol = static_cast<E_PROTOCOL>(_session->GetProtocol());
 	switch (l_protocol)
 	{
-	case TestManager::E_PROTOCOL::CTS_IDCREATE:
+	case TestManager::E_PROTOCOL::IDCREATE:
 		IdCreateProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::CTS_SPAWN:
+
+	case TestManager::E_PROTOCOL::SPAWN:
 		SpawnProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::CTS_MOVE:
+	case TestManager::E_PROTOCOL::MOVE:
 		MoveProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::CTS_JUMP:
+	case TestManager::E_PROTOCOL::JUMP:
 		JumpProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::CTS_DODGE:
+	case TestManager::E_PROTOCOL::DODGE:
 		DodgeProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::CTS_FIRE:
+	case TestManager::E_PROTOCOL::FIRE:
 		FireProcess(_session);
 		break;
-	case TestManager::E_PROTOCOL::CTS_EXIT:
+	case TestManager::E_PROTOCOL::EXIT:
 		ExitProcess(_session);
-		break;
-	case TestManager::E_PROTOCOL::Test:
-		TestProcess(_session);
 		break;
 	default:
 		LogManager::GetInstance()->LogWrite(7777);
@@ -97,11 +94,59 @@ void TestManager::IdCreateProcess(Session* _session)
 	m_playerList.push_back(_session);
 	m_giveIdCounter++;
 	
-	if (!_session->SendPacket(static_cast<int>(E_PROTOCOL::STC_IDCREATE), l_dataSize, l_data))
+	if (!_session->SendPacket(static_cast<int>(E_PROTOCOL::IDCREATE), l_dataSize, l_data))
 	{
 		LogManager::GetInstance()->LogWrite(1005);
 	}
 }
+
+void TestManager::PlayTypeProcess(Session* _session)
+{
+	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+	BYTE l_data[BUFSIZE];
+	ZeroMemory(l_data, BUFSIZE);
+	int l_dataSize = -1;
+
+	MyStream l_stream;
+	l_stream->SetStream(_session->GetDataField());
+
+	int select;
+	l_stream->ReadInt(&select);
+	if (select == 1)
+	{// 싱글 선택
+		// 새로운 방 만들어서 입장
+		int Num = m_room.size();
+		m_room[Num].isMulti = false;
+		m_room[Num].count = 1;
+		m_room
+		// 게임 시작 패킷 전송...
+	}
+	else // select == 2
+	{//멀티 선택
+		// 빈방 찾아보기
+		bool flag = false;
+		for (auto room : m_room)
+		{
+			if (room.second.isMulti)
+			{
+				if (room.second.count == 1)// 1명 이하 일때
+				{
+					room.second.count = 2;
+					// 게임 시작 패킷 전송... (상대에게도)
+					flag = true;
+				}
+			}
+		}
+		if (!flag)
+		{// 빈방이 없으면 방만들기
+			int Num = m_room.size();
+			m_room[Num].isMulti = true;
+			m_room[Num].count = 1;
+			// 게임 대기 패킷 전송...
+		}
+	}
+}
+
 void TestManager::SpawnProcess(Session* _session)
 {
 	LockGuard l_lockGuard(&m_criticalKey); // 잠금
@@ -115,7 +160,7 @@ void TestManager::SpawnProcess(Session* _session)
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
 	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::STC_SPAWN), l_dataSize, l_data))
+		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::SPAWN), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1005);
 		}
@@ -141,7 +186,7 @@ void TestManager::MoveProcess(Session* _session)
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
 	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::STC_MOVE), l_dataSize, l_data))
+		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::MOVE), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
@@ -167,7 +212,7 @@ void TestManager::JumpProcess(Session* _session)
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
 	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::STC_JUMP), l_dataSize, l_data))
+		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::JUMP), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
@@ -193,7 +238,7 @@ void TestManager::DodgeProcess(Session* _session)
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
 	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::STC_DODGE), l_dataSize, l_data))
+		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::DODGE), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
@@ -215,7 +260,7 @@ void TestManager::FireProcess(Session* _session)
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
 	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::STC_FIRE), l_dataSize, l_data))
+		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::FIRE), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
@@ -237,12 +282,12 @@ void TestManager::ExitProcess(Session* _session)
 	{
 		if ((*iter) == _session)
 		{
-			if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::STC_EXIT), l_dataSize, l_data))
+			if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
 			{
 				LogManager::GetInstance()->LogWrite(1006);
 			}
 		}
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::STC_OUT), l_dataSize, l_data))
+		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::LEAVE), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
@@ -279,12 +324,12 @@ void TestManager::ForceExitProcess(Session* _session)
 	{
 		if ((*iter) == _session)
 		{
-			if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::STC_EXIT), l_dataSize, l_data))
+			if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
 			{
 				LogManager::GetInstance()->LogWrite(1006);
 			}
 		}
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::STC_OUT), l_dataSize, l_data))
+		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::LEAVE), l_dataSize, l_data))
 		{
 			LogManager::GetInstance()->LogWrite(1006);
 		}
@@ -398,40 +443,3 @@ void TestManager::FireDataSplit(BYTE* _data, FireData& _fireData)
 	memcpy(&_fireData, l_focusPointer, sizeof(FireData));
 	l_focusPointer = l_focusPointer + sizeof(FireData);*/
 }
-
-
-
-#pragma region 태스트용
-void TestManager::TestProcess(Session* _session)
-{
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
-	BYTE l_data[BUFSIZE];
-	ZeroMemory(l_data, BUFSIZE);
-	int l_dataSize = -1;
-
-	l_dataSize = TestDataMake(l_data);
-
-	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); iter++)
-	{
-		if (!(*iter)->SendPacket(static_cast<int>(E_PROTOCOL::Test), l_dataSize, l_data))
-		{
-			LogManager::GetInstance()->LogWrite(1005);
-		}
-	}
-
-	return;
-}
-
-int TestManager::TestDataMake(BYTE* _data)
-{
-	int l_packedSize = 0;
-	BYTE* l_focusPointer = _data;
-	l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_packedSize, static_cast<int>(TestList.size()));
-	for (list<TestListData>::iterator iter = TestList.begin(); iter != TestList.end(); iter++)
-	{
-		l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_packedSize, (*iter));
-	}
-
-	return l_packedSize;
-}
-#pragma endregion

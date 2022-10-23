@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClCompile Include="ConsoleControlHandler.cpp" />
     <ClCompile Include="DataBaseManager.cpp" />
+    <ClCompile Include="Room.cpp" />
     <ClCompile Include="Global.cpp" />
     <ClCompile Include="IOCP.cpp" />
     <ClCompile Include="LockGuard.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="ProtocolExtension.cpp">
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="RoomManager.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="SessionManager.cpp" />
     <ClCompile Include="Socket.cpp" />
@@ -170,6 +172,7 @@
     <ClInclude Include="DataBaseManager.h">
       <DeploymentContent>true</DeploymentContent>
     </ClInclude>
+    <ClInclude Include="Room.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="IOCP.h" />
     <ClInclude Include="LockGuard.h" />
@@ -179,7 +182,9 @@
     <ClInclude Include="MainManager.h" />
     <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="PacketData.h" />
     <ClInclude Include="ProtocolExtension.h" />
+    <ClInclude Include="RoomManager.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="SessionManager.h" />
     <ClInclude Include="Socket.h" />
@@ -188,9 +193,6 @@
     <ClInclude Include="TestManager.h" />
     <ClInclude Include="TestState.h" />
     <ClInclude Include="Util.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

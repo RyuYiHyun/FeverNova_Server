@@ -95,4 +95,12 @@ int Session::GetIdNumber()
 {
 	return m_idNumber;
 }
+void* Session::GetRoom()
+{
+	return m_room;
+}
+void Session::SetRoom(void* _room)
+{
+	m_room = _room;
+}
 #pragma endregion
