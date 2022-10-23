@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Global.h"
 #include "Socket.h"
 #include "Session.h"
@@ -24,14 +24,14 @@ private:
 public:
 	enum class E_PROTOCOL
 	{
-		CRYPTOKEY,
-		IDCREATE,
+		CRYPTOKEY,      // �ʱ� �Ϻ�ȣȭŰ ���� ��ȣ
+		IDCREATE,       // ���̵� ����
 
-		PLAYTYPE,
-		WAIT,
-		SINGLE_START,
-		MULTI_HOST_START,
-		MULTI_GUEST_START,
+		PLAYTYPE,       // ��Ƽ or �̱� ����
+		WAIT,           // ��Ƽ ���
+		SINGLE_START,           // �̱� ����
+		MULTI_HOST_START,       // ȣ��Ʈ(��ü) ����
+		MULTI_GUEST_START,      // �Խ�Ʈ(����) ����
 
 		SPAWN,
 		MOVE,
@@ -41,15 +41,21 @@ public:
 		LEAVE,
 		EXIT,
 
-		//JUNYOUNG_PROTOCOL
+		//jjch PROTOCOL
+		REMOTE_MOVE,
+		REMOTE_ATTACK,
+		REMOTE_DEATH,
+		REMOTE_HIT,
+
+		//JY PROTOCOL
 		NPC_SPAWN,
 		NPC_TRANSFORM,
 		ITEM_SPAWN,
 		NPC_HP,
 
-		//KJB_PROTOCOL
+		//KJB PROTOCOL
 		NPC_TRIGGER,
-		NPC_ATTACK,
+		NPC_ATTACK
 	};
 
 	void Function(Session* _session);
