@@ -415,7 +415,14 @@ void GameManager::ExitProcess(Session* _session)
 				LogManager::GetInstance()->LogWrite(1006);
 			}
 		}
-	}// 예외
+	}
+	else
+	{
+		if (!_session->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
+		{
+			LogManager::GetInstance()->LogWrite(1006);
+		}
+	}
 
 
 
@@ -463,7 +470,14 @@ void GameManager::ForceExitProcess(Session* _session)
 				LogManager::GetInstance()->LogWrite(1006);
 			}
 		}
-	}// 예외
+	}
+	else
+	{
+		if (!_session->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
+		{
+			LogManager::GetInstance()->LogWrite(1006);
+		}
+	}
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); )
 	{
