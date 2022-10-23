@@ -97,4 +97,37 @@ struct SpawnData_Item
 	int m_itemID;
 	Vector3 m_position;
 };
+
+struct NpcTriggerData
+{
+	NpcTriggerData() {}
+	NpcTriggerData(int _objectID) { m_objectID = _objectID, m_flag = -1; }
+	void CopyData(NpcTriggerData _Src)
+	{
+		m_objectID = _Src.m_objectID;
+		m_flag = _Src.m_flag;
+	}
+	int m_objectID;
+	int m_flag;
+};
+
+struct NpcAttackData
+{
+	NpcAttackData() {}
+	void CopyData(NpcAttackData _Src)
+	{
+		m_objectID = _Src.m_objectID;
+		m_position = _Src.m_position;
+		m_rotation = _Src.m_rotation;
+		m_index = _Src.m_index;
+		m_targetID = _Src.m_targetID;
+	}
+
+	int m_objectID;
+	Vector3 m_position;
+	Quaternion m_rotation;
+
+	int m_index;
+	int m_targetID;
+};
 #pragma pack(pop)

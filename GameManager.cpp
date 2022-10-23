@@ -87,6 +87,12 @@ void GameManager::Function(Session* _session)
 	case GameManager::E_PROTOCOL::ITEM_SPAWN:
 		ItemSpawnProcess(_session);
 		break;
+	case  GameManager::E_PROTOCOL::NPC_TRIGGER:
+		NpcTriggerProcess(_session);
+		break;
+	case  GameManager::E_PROTOCOL::NPC_ATTACK:
+		NpcAttackProcess(_session);
+		break;
 	case GameManager::E_PROTOCOL::EXIT:
 		ExitProcess(_session);
 		break;
@@ -387,6 +393,70 @@ void GameManager::ItemSpawnProcess(Session* _session)
 	}
 }
 
+void GameManager::NpcTriggerProcess(Session* _session)
+{
+	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+	BYTE l_data[BUFSIZE];
+	ZeroMemory(l_data, BUFSIZE);
+	int l_dataSize = -1;
+
+	MyStream l_stream;
+	l_stream->SetStream(_session->GetDataField());
+
+	NpcTriggerData _npcTriggerData;
+	l_stream->ReadBytes(reinterpret_cast<BYTE*>(&_npcTriggerData), sizeof(NpcTriggerData));
+
+	l_dataSize = NpcTriggerDataMake(l_data, _npcTriggerData);
+
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+	if (room == nullptr) { return; }// 예외
+
+	for (auto player : room->players)
+	{
+		if (_session != player)
+		{
+			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::NPC_TRIGGER), l_dataSize, l_data))
+			{
+				LogManager::GetInstance()->LogWrite(1006);
+			}
+			break;
+		}
+	}
+	return;
+}
+
+void GameManager::NpcAttackProcess(Session* _session)
+{
+	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+	BYTE l_data[BUFSIZE];
+	ZeroMemory(l_data, BUFSIZE);
+	int l_dataSize = -1;
+
+	MyStream l_stream;
+	l_stream->SetStream(_session->GetDataField());
+
+	NpcAttackData _npcAttackData;
+	l_stream->ReadBytes(reinterpret_cast<BYTE*>(&_npcAttackData), sizeof(NpcAttackData));
+
+	l_dataSize = NpcAttackDataMake(l_data, _npcAttackData);
+
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+	if (room == nullptr) { return; }// 예외
+
+	for (auto player : room->players)
+	{
+		if (_session != player)
+		{
+			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::NPC_ATTACK), l_dataSize, l_data))
+			{
+				LogManager::GetInstance()->LogWrite(1006);
+			}
+			break;
+		}
+	}
+	return;
+}
+
 void GameManager::ExitProcess(Session* _session)
 {
 	BYTE l_data[BUFSIZE];
@@ -584,6 +654,24 @@ int GameManager::ItemSpawnDataMake(BYTE* _data, SpawnData_Item _SpawnData_Item)
 	return l_stream->GetLength();
 }
 
+int GameManager::NpcTriggerDataMake(BYTE* _data, NpcTriggerData _npcTriggerData)
+{
+	MyStream l_stream;
+	l_stream->SetStream(_data);
+	l_stream->WriteBytes(reinterpret_cast<BYTE*>(&_npcTriggerData), sizeof(NpcTriggerData));
+
+	return l_stream->GetLength();
+}
+
+int GameManager::NpcAttackDataMake(BYTE* _data, NpcAttackData _npcAttackData)
+{
+	MyStream l_stream;
+	l_stream->SetStream(_data);
+	l_stream->WriteBytes(reinterpret_cast<BYTE*>(&_npcAttackData), sizeof(NpcAttackData));
+
+	return l_stream->GetLength();
+}
+
 int GameManager::ExitDataMake(BYTE* _data, int _id)
 {
 	MyStream l_stream;
@@ -592,7 +680,6 @@ int GameManager::ExitDataMake(BYTE* _data, int _id)
 
 	return l_stream->GetLength();
 }
-
 
 void GameManager::MoveDataSplit(BYTE* _data, MoveData& _moveData)
 {

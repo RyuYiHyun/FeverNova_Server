@@ -45,6 +45,10 @@ public:
 		NPC_SPAWN,
 		NPC_TRANSFORM,
 		ITEM_SPAWN,
+
+		//KJB_PROTOCOL
+		NPC_TRIGGER,
+		NPC_ATTACK,
 	};
 
 	void Function(Session* _session);
@@ -60,6 +64,8 @@ public:
 	void NpcSpawnProcess(Session* _session);
 	void NpcTransformProcess(Session* _session);
 	void ItemSpawnProcess(Session* _session);
+	void NpcTriggerProcess(Session* _session);
+	void NpcAttackProcess(Session* _session);
 
 	void ExitProcess(Session* _session);
 	void ForceExitProcess(Session* _session);
@@ -75,6 +81,8 @@ public:
 	int NpcSpawnDataMake(BYTE* _data, SpawnData_NPC _SpawnData_npc);
 	int NpcTransformDataMake(BYTE* _data, TransformData_NPC _TransformData_npc);
 	int ItemSpawnDataMake(BYTE* _data, SpawnData_Item _SpawnData_Item);
+	int NpcTriggerDataMake(BYTE* _data, NpcTriggerData _npcTriggerData);
+	int NpcAttackDataMake(BYTE* _data, NpcAttackData _npcTriggerData);
 
 	int ExitDataMake(BYTE* _data, int _id);
 	// unpacking
