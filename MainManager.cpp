@@ -5,7 +5,8 @@
 #include "SessionManager.h"
 #include "DataBaseManager.h"
 #include "LogManager.h"
-#include "TestManager.h"
+#include "GameManager.h"
+#include "RoomManager.h"
 #pragma region Singleton
 bool MainManager::CreateInstance()
 {
@@ -23,6 +24,7 @@ bool MainManager::CreateInstance()
 	//DataBaseManager::CreateInstance();
 	//LoginManager::CreateInstance();
 	SessionManager::CreateInstance();
+	RoomManager::CreateInstance();
 	GameManager::CreateInstance();
 	return true; // 己傍利 积己
 }
@@ -31,6 +33,7 @@ void MainManager::DestroyInstance()
 {
 	// 窍困 概聪历 昏力
 	GameManager::DestroyInstance();
+	RoomManager::DestroyInstance();
 	SessionManager::DestroyInstance();
 	//LoginManager::DestroyInstance();
 	//DataBaseManager::DestroyInstance();

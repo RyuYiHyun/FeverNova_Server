@@ -4,7 +4,7 @@
 #include "Session.h"
 #include "SessionManager.h"
 #include "PacketData.h"
-#include <map>
+#include "RoomManager.h"
 class GameManager
 {
 #pragma region Singleton
@@ -24,51 +24,42 @@ private:
 public:
 	enum class E_PROTOCOL
 	{
-		CRYPTOKEY,		// 서버 -> 클라				:	초기 암복호화키 전송 신호
+		CRYPTOKEY,
+		IDCREATE,
 
-		STC_IDCREATE,
-		CTS_IDCREATE,
-		
-		STC_SPAWN,
-		CTS_SPAWN,
+		PLAYTYPE,
+		WAIT,
+		SINGLE_START,
+		MULTI_HOST_START,
+		MULTI_GUEST_START,
 
-		STC_MOVE,
-		CTS_MOVE,
+		SPAWN,
+		MOVE,
+		JUMP,
+		DODGE,
+		FIRE,
+		LEAVE,
+		EXIT,
 
-		STC_JUMP,
-		CTS_JUMP,
-
-		STC_DODGE,
-		CTS_DODGE,
-
-		STC_FIRE,
-		CTS_FIRE,
-
-		STC_OUT,
-		CTS_OUT,
-
-		STC_EXIT,
-		CTS_EXIT,
-		
-		STC_NPC_TRIGGER,
-		CTS_NPC_TRIGGER,
-
-		STC_NPC_ATTACK,
-		CTS_NPC_ATTACK,
-
-		Test,
+		//JUNYOUNG_PROTOCOL
+		NPC_SPAWN,
+		NPC_TRANSFORM,
+		ITEM_SPAWN,
 	};
 
 	void Function(Session* _session);
 
 	void IdCreateProcess(Session* _session);
+	void PlayTypeProcess(Session* _session);
+
 	void SpawnProcess(Session* _session);
 	void MoveProcess(Session* _session);
 	void JumpProcess(Session* _session);
 	void DodgeProcess(Session* _session);
 	void FireProcess(Session* _session);
-	void NpcTriggerProcess(Session* _session);
-	void NpcAttackProcess(Session* _session);
+	void NpcSpawnProcess(Session* _session);
+	void NpcTransformProcess(Session* _session);
+	void ItemSpawnProcess(Session* _session);
 
 	void ExitProcess(Session* _session);
 	void ForceExitProcess(Session* _session);
@@ -76,35 +67,26 @@ public:
 #pragma region Packing&Unpacking
 	// packing
 	int IdDataMake(BYTE* _data, int _id);
-	int SpawnDataMake(BYTE* _data);
+	int SpawnDataMake(BYTE* _data, Room& _room);
 	int MoveDataMake(BYTE* _data, MoveData _moveData);
 	int JumpDataMake(BYTE* _data, int _id);
 	int DodgeDataMake(BYTE* _data, int _id);
 	int FireDataMake(BYTE* _data, FireData _fireData);
-	int NpcTriggerDataMake(BYTE* _data, NpcTriggerData _npcTriggerData);
-	int NpcAttackDataMake(BYTE* _data, NpcAttackData _npcTriggerData);
+	int NpcSpawnDataMake(BYTE* _data, SpawnData_NPC _SpawnData_npc);
+	int NpcTransformDataMake(BYTE* _data, TransformData_NPC _TransformData_npc);
+	int ItemSpawnDataMake(BYTE* _data, SpawnData_Item _SpawnData_Item);
 
 	int ExitDataMake(BYTE* _data, int _id);
-
 	// unpacking
 	void MoveDataSplit(BYTE* _data, MoveData& _moveData);
 	void FireDataSplit(BYTE* _data, FireData& _fireData);
-	
-
+	void NpcSpawnDataSplit(BYTE* _data, SpawnData_NPC& _SpawnData_npc);
+	void NpcTransformDataSplit(BYTE* _data, TransformData_NPC& _TransformData_npc);
+	void ItemSpawnDataSplit(BYTE* _data, SpawnData_Item& _SpawnData_Item);
 #pragma endregion
-
-#pragma region  Test
-	void TestProcess(Session* _session);
-	int TestDataMake(BYTE* _data);
-#pragma endregion
-
 private:
 	CriticalKey m_criticalKey;
 	int m_giveIdCounter;
 	list<Session*> m_playerList;
-	map<Session*, MoveData> m_MoveDataList;
-	// 플레이어 정보 - 세션
-	// 몬스터 정보 - 무관
-	// 지형 정보 - 무관
 };
 
