@@ -18,11 +18,14 @@ struct Quaternion
 	Quaternion(float _X, float _Y, float _Z, float _W) { X = _X; Y = _Y; Z = _Z; W = _W; }
 	float X; float Y; float Z; float W;
 };
-struct MoveData
+
+// JY : Rename
+// Before : MoveData
+struct PlayerTransformData
 {
-	MoveData() { m_id = -1; m_state = 0; }
-	MoveData(int _id) { m_id = _id; m_state = 0; }
-	void CopyData(MoveData _Src)
+	PlayerTransformData() { m_id = -1; m_state = 0; }
+	PlayerTransformData(int _id) { m_id = _id; m_state = 0; }
+	void CopyData(PlayerTransformData _Src)
 	{
 		m_id = _Src.m_id;
 		m_velocity = _Src.m_velocity;
@@ -41,11 +44,13 @@ struct MoveData
 	int m_state;
 };
 
-struct FireData
+// JY : Rename
+// Before : FireData
+struct PlayerFireData
 {
-	FireData() { m_id = -1; }
-	FireData(int _id) { m_id = _id; }
-	void CopyData(FireData _Src)
+	PlayerFireData() { m_id = -1; }
+	PlayerFireData(int _id) { m_id = _id; }
+	void CopyData(PlayerFireData _Src)
 	{
 		m_id = _Src.m_id;
 		m_position = _Src.m_position;
@@ -58,10 +63,12 @@ struct FireData
 	float m_currentMosueRadius;
 };
 
-struct SpawnData_NPC
+// JY : Rename
+// Before : PacketSpawnData_NPC
+struct NpcSpawnData
 {
-	SpawnData_NPC() {}
-	SpawnData_NPC(int _objectID, int _monsterID, Vector3 _position)
+	NpcSpawnData() {}
+	NpcSpawnData(int _objectID, int _monsterID, Vector3 _position)
 	{
 		m_objectID = _objectID;
 		m_monsterID = _monsterID;
@@ -72,10 +79,12 @@ struct SpawnData_NPC
 	Vector3 m_position;
 };
 
-struct TransformData_NPC
+// JY : Rename
+// Before : PacketMoveData_NPC
+struct NpcTransformData
 {
-	TransformData_NPC() {}
-	TransformData_NPC(int _objectID, Vector3 _position, Quaternion _rotation)
+	NpcTransformData() {}
+	NpcTransformData(int _objectID, Vector3 _position, Quaternion _rotation)
 	{
 		m_objectID = _objectID;
 		m_position = _position;
@@ -86,16 +95,16 @@ struct TransformData_NPC
 	Quaternion m_rotation;
 };
 
-struct SpawnData_Item
+struct NpcHpData
 {
-	SpawnData_Item() {}
-	SpawnData_Item(int _itemID, Vector3 _position)
+	NpcHpData() {}
+	NpcHpData(int _objectID, int _currentHP)
 	{
-		m_itemID = _itemID;
-		m_position = _position;
+		m_objectID = _objectID;
+		m_currentHP = _currentHP;
 	}
-	int m_itemID;
-	Vector3 m_position;
+	int m_objectID;
+	int m_currentHP;
 };
 
 struct NpcTriggerData
@@ -111,10 +120,12 @@ struct NpcTriggerData
 	int m_flag;
 };
 
-struct NpcAttackData
+// JY : Rename
+// Before : NpcAttackData
+struct NpcSkillData
 {
-	NpcAttackData() {}
-	void CopyData(NpcAttackData _Src)
+	NpcSkillData() {}
+	void CopyData(NpcSkillData _Src)
 	{
 		m_objectID = _Src.m_objectID;
 		m_position = _Src.m_position;
@@ -129,17 +140,31 @@ struct NpcAttackData
 
 	int m_index;
 	int m_targetID;
+
+
 };
 
-struct NpcHPData
+struct ItemSpawnData
 {
-	NpcHPData() {}
-	NpcHPData(int _objectID, int _currentHP)
+	ItemSpawnData() {}
+	ItemSpawnData(int _itemID, Vector3 _position)
 	{
-		m_objectID = _objectID;
-		m_currentHP = _currentHP;
+		m_itemID = _itemID;
+		m_position = _position;
 	}
-	int m_objectID;
-	int m_currentHP;
+	int m_itemID;
+	Vector3 m_position;
+};
+
+struct ItemDeSpawnData
+{
+	ItemDeSpawnData() {}
+	ItemDeSpawnData(int _playerID, int _itemID)
+	{
+		m_playerID = _playerID;
+		m_itemID = _itemID;
+	}
+	int m_playerID;
+	int m_itemID;
 };
 #pragma pack(pop)

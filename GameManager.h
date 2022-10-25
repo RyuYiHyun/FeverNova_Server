@@ -33,29 +33,31 @@ public:
 		MULTI_HOST_START,       // ȣ��Ʈ(��ü) ����
 		MULTI_GUEST_START,      // �Խ�Ʈ(����) ����
 
-		SPAWN,
-		MOVE,
-		JUMP,
-		DODGE,
-		FIRE,
 		LEAVE,
 		EXIT,
 
-		//jjch PROTOCOL
-		REMOTE_MOVE,
-		REMOTE_ATTACK,
-		REMOTE_DEATH,
-		REMOTE_HIT,
+		PLAYER_SPAWN,
+		PLAYER_TRANSFORM,
+		PLAYER_JUMP,
+		PLAYER_DODGE,
+		PLAYER_FIRE,
 
-		//JY PROTOCOL
 		NPC_SPAWN,
+		// JY : Replace
+		// jjch PROTOCOL - REMOTE_MOVE
 		NPC_TRANSFORM,
-		ITEM_SPAWN,
-		NPC_HP,
-
-		//KJB PROTOCOL
+		// JY : Replace
+		// jjch PROTOCOL - REMOTE_HIT
+		NPC_UPDATEHP,
+		// JY : Replace
+		// jjch PROTOCOL - REMOTE_DEATH
 		NPC_TRIGGER,
-		NPC_ATTACK
+		// JY : Replace
+		// jjch PROTOCOL - REMOTE_ATTACK
+		NPC_SKILL,
+
+		ITEM_SPAWN,
+		ITEM_DESPAWN,
 	};
 
 	void Function(Session* _session);
@@ -63,17 +65,20 @@ public:
 	void IdCreateProcess(Session* _session);
 	void PlayTypeProcess(Session* _session);
 
-	void SpawnProcess(Session* _session);
-	void MoveProcess(Session* _session);
-	void JumpProcess(Session* _session);
-	void DodgeProcess(Session* _session);
-	void FireProcess(Session* _session);
+	void PlayerSpawnProcess(Session* _session);
+	void PlayerTransformProcess(Session* _session);
+	void PlayerJumpProcess(Session* _session);
+	void PlayerDodgeProcess(Session* _session);
+	void PlayerFireProcess(Session* _session);
+
 	void NpcSpawnProcess(Session* _session);
 	void NpcTransformProcess(Session* _session);
-	void ItemSpawnProcess(Session* _session);
+	void NpcUpdateHpProcess(Session* _session);
 	void NpcTriggerProcess(Session* _session);
-	void NpcAttackProcess(Session* _session);
-	void NpcHPProcess(Session* _session);
+	void NpcSkillProcess(Session* _session);
+
+	void ItemSpawnProcess(Session* _session);
+	void ItemDeSpawnProcess(Session* _sesison);
 
 	void ExitProcess(Session* _session);
 	void ForceExitProcess(Session* _session);
@@ -81,26 +86,35 @@ public:
 #pragma region Packing&Unpacking
 	// packing
 	int IdDataMake(BYTE* _data, int _id);
-	int SpawnDataMake(BYTE* _data, Room& _room);
-	int MoveDataMake(BYTE* _data, MoveData _moveData);
-	int JumpDataMake(BYTE* _data, int _id);
-	int DodgeDataMake(BYTE* _data, int _id);
-	int FireDataMake(BYTE* _data, FireData _fireData);
-	int NpcSpawnDataMake(BYTE* _data, SpawnData_NPC _SpawnData_npc);
-	int NpcTransformDataMake(BYTE* _data, TransformData_NPC _TransformData_npc);
-	int ItemSpawnDataMake(BYTE* _data, SpawnData_Item _SpawnData_Item);
+	int PlayerSpawnDataMake(BYTE* _data, Room& _room);
+	int PlayerTransformDataMake(BYTE* _data, PlayerTransformData _playerTransformData);
+	int PlayerJumpDataMake(BYTE* _data, int _id);
+	int PlayerDodgeDataMake(BYTE* _data, int _id);
+	int PlayerFireDataMake(BYTE* _data, PlayerFireData _playerFireData);
+
+	int NpcSpawnDataMake(BYTE* _data, NpcSpawnData _npcSpawnData);
+	int NpcTransformDataMake(BYTE* _data, NpcTransformData _npcTransformData);
+	int NpcUpdateHpDataMake(BYTE* _data, NpcHpData _npcHpData);
 	int NpcTriggerDataMake(BYTE* _data, NpcTriggerData _npcTriggerData);
-	int NpcAttackDataMake(BYTE* _data, NpcAttackData _npcTriggerData);
-	int NpcHPDataMake(BYTE* _data, NpcHPData _NpcHPData);
+	int NpcSkillDataMake(BYTE* _data, NpcSkillData _npcSkillData);
+
+	int ItemSpawnDataMake(BYTE* _data, ItemSpawnData _itemSpawnData);
+	int ItemDeSpawnDataMake(BYTE* _data, ItemDeSpawnData _itemDeSpawnData);
 
 	int ExitDataMake(BYTE* _data, int _id);
+
 	// unpacking
-	void MoveDataSplit(BYTE* _data, MoveData& _moveData);
-	void FireDataSplit(BYTE* _data, FireData& _fireData);
-	void NpcSpawnDataSplit(BYTE* _data, SpawnData_NPC& _SpawnData_npc);
-	void NpcTransformDataSplit(BYTE* _data, TransformData_NPC& _TransformData_npc);
-	void ItemSpawnDataSplit(BYTE* _data, SpawnData_Item& _SpawnData_Item);
-	void NpcHPDataSplit(BYTE* _data, NpcHPData& _NpcHPData);
+	void PlayerTransformDataSplit(BYTE* _data, PlayerTransformData& _playerTransformData);
+	void PlayerFireDataSplit(BYTE* _data, PlayerFireData& _playerFireData);
+
+	void NpcSpawnDataSplit(BYTE* _data, NpcSpawnData& _npcSpawnData);
+	void NpcTransformDataSplit(BYTE* _data, NpcTransformData& _npcTransformData);
+	void NpcUpdateHpDataSplit(BYTE* _data, NpcHpData& _npcHpData);
+	void NpcTriggerDataSplit(BYTE* _data, NpcTriggerData& _npcTriggerData);
+	void NpcSkillDataSplit(BYTE* _data, NpcSkillData& _npcSkillData);
+
+	void ItemSpawnDataSplit(BYTE* _data, ItemSpawnData& _itemSpawnData);
+	void ItemDeSpawnDataSplit(BYTE* _data, ItemDeSpawnData& _itemDeSpawnData);
 #pragma endregion
 private:
 	CriticalKey m_criticalKey;
