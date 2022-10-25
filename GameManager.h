@@ -5,6 +5,7 @@
 #include "SessionManager.h"
 #include "PacketData.h"
 #include "RoomManager.h"
+#include "LogManager.h"
 class GameManager
 {
 #pragma region Singleton
@@ -120,4 +121,20 @@ private:
 	CriticalKey m_criticalKey;
 	int m_giveIdCounter;
 	list<Session*> m_playerList;
+};
+namespace game
+{
+	class util
+	{
+	public:
+		static bool SEND(Session* _session, GameManager::E_PROTOCOL _protocol, int& _dataSize, BYTE* _data)
+		{
+			if (!_session->SendPacket(static_cast<int>(_protocol), _dataSize, _data))
+			{
+				LogManager::GetInstance()->LogWrite(1006);
+				return false;
+			}
+			return true;
+		}
+	};
 };

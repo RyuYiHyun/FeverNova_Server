@@ -31,6 +31,21 @@ public:
 	bool ReadBytes(BYTE*, int);
 	bool ReadTchar(TCHAR*);
 	bool ReadTchars(PTCHAR, int);
+
+	template<typename T>
+	void DataPacketSplit(BYTE* _data, T& _unpackBuffer)
+	{
+		SetStream(_data);
+		ReadBytes(reinterpret_cast<BYTE*>(&_unpackBuffer), sizeof(T));
+	}
+
+	template<typename T>
+	int DataPacketMake(BYTE* _data, T& _packData)
+	{
+		SetStream(_data);
+		WriteBytes(reinterpret_cast<BYTE*>(&_packData), sizeof(T));
+		return m_length;
+	}
 private:
 	BYTE* m_streamPointer;
 	int	m_length;

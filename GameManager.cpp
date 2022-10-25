@@ -1,5 +1,4 @@
 #include "GameManager.h"
-#include "LogManager.h"
 #include "SessionManager.h"
 
 //
@@ -99,6 +98,9 @@ void GameManager::Function(Session* _session)
 	case GameManager::E_PROTOCOL::ITEM_SPAWN:
 		ItemSpawnProcess(_session);
 		break;
+	case GameManager::E_PROTOCOL::ITEM_DESPAWN:
+		ItemDeSpawnProcess(_session);
+		break;
 	default:
 		LogManager::GetInstance()->LogWrite(7777);
 		break;
@@ -107,30 +109,34 @@ void GameManager::Function(Session* _session)
 }
 void GameManager::IdCreateProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
+
 	_session->SetIdNumber(m_giveIdCounter);
-	l_dataSize = IdDataMake(l_data, m_giveIdCounter);
+	l_dataSize = l_stream->DataPacketMake(l_data, m_giveIdCounter);
 	m_playerList.push_back(_session);
 	m_giveIdCounter++;
 
-	if (!_session->SendPacket(static_cast<int>(E_PROTOCOL::IDCREATE), l_dataSize, l_data))
-	{
-		LogManager::GetInstance()->LogWrite(1005);
-	}
+	game::util::SEND(_session, E_PROTOCOL::IDCREATE, l_dataSize, l_data);
 }
 
 void GameManager::ExitProcess(Session* _session)
 {
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
-
-	l_dataSize = ExitDataMake(l_data, _session->GetIdNumber());
+	int id = _session->GetIdNumber();
+	l_dataSize = l_stream->DataPacketMake(l_data, id);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room != nullptr)
@@ -140,26 +146,16 @@ void GameManager::ExitProcess(Session* _session)
 			if (player == _session)
 			{
 				RoomManager::GetInstance()->OutCheck(_session);
-				if (!player->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
-				{
-					LogManager::GetInstance()->LogWrite(1006);
-				}
+				game::util::SEND(player, E_PROTOCOL::EXIT, l_dataSize, l_data);
+				continue;
 			}
-			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::LEAVE), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1006);
-			}
+			game::util::SEND(player, E_PROTOCOL::LEAVE, l_dataSize, l_data);
 		}
 	}
 	else
 	{
-		if (!_session->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
-		{
-			LogManager::GetInstance()->LogWrite(1006);
-		}
+		game::util::SEND(_session, E_PROTOCOL::EXIT, l_dataSize, l_data);
 	}
-
-
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); )
 	{
@@ -178,16 +174,18 @@ void GameManager::ExitProcess(Session* _session)
 
 void GameManager::ForceExitProcess(Session* _session)
 {
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
-
-	l_dataSize = ExitDataMake(l_data, _session->GetIdNumber());
+	int id = _session->GetIdNumber();
+	l_dataSize = l_stream->DataPacketMake(l_data, id);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
-
 	if (room != nullptr)
 	{
 		for (auto player : room->players)
@@ -195,23 +193,15 @@ void GameManager::ForceExitProcess(Session* _session)
 			if (player == _session)
 			{
 				RoomManager::GetInstance()->OutCheck(_session);
-				if (!player->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
-				{
-					LogManager::GetInstance()->LogWrite(1006);
-				}
+				game::util::SEND(player, E_PROTOCOL::EXIT, l_dataSize, l_data);
+				continue;
 			}
-			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::LEAVE), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1006);
-			}
+			game::util::SEND(player, E_PROTOCOL::LEAVE, l_dataSize, l_data);
 		}
 	}
 	else
 	{
-		if (!_session->SendPacket(static_cast<int>(E_PROTOCOL::EXIT), l_dataSize, l_data))
-		{
-			LogManager::GetInstance()->LogWrite(1006);
-		}
+		game::util::SEND(_session, E_PROTOCOL::EXIT, l_dataSize, l_data);
 	}
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); )
@@ -231,18 +221,16 @@ void GameManager::ForceExitProcess(Session* _session)
 
 void GameManager::PlayTypeProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
-
 	MyStream l_stream;
-	l_stream->SetStream(_session->GetDataField());
+#pragma endregion
 
 	int select;
-	l_stream->ReadInt(&select);
-
-
+	l_stream->DataPacketSplit(_session->GetDataField(), select);
 	l_dataSize = 0;
 
 	if (select == 1)   // 1P
@@ -251,10 +239,7 @@ void GameManager::PlayTypeProcess(Session* _session)
 		room->enterPlayer(_session);
 		_session->SetRoom(room);
 		// 게임 시작 메세지
-		if (!room->players[0]->SendPacket(static_cast<int>(E_PROTOCOL::SINGLE_START), l_dataSize, l_data))
-		{
-			LogManager::GetInstance()->LogWrite(1005);
-		}
+		game::util::SEND(room->players[0], E_PROTOCOL::SINGLE_START, l_dataSize, l_data);
 	}
 	else if (select == 2) // 2P
 	{
@@ -266,24 +251,15 @@ void GameManager::PlayTypeProcess(Session* _session)
 			room->enterPlayer(_session);
 			_session->SetRoom(room);
 			// 게임 대기..................
-			if (!room->players[0]->SendPacket(static_cast<int>(E_PROTOCOL::WAIT), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1005);
-			}
+			game::util::SEND(room->players[0], E_PROTOCOL::WAIT, l_dataSize, l_data);
 		}
 		else
 		{
 			room->enterPlayer(_session);
 			_session->SetRoom(room);
 			// 게임 시작..................
-			if (!room->players[0]->SendPacket(static_cast<int>(E_PROTOCOL::MULTI_HOST_START), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1005);
-			}
-			if (!room->players[1]->SendPacket(static_cast<int>(E_PROTOCOL::MULTI_GUEST_START), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1005);
-			}
+			game::util::SEND(room->players[0], E_PROTOCOL::MULTI_HOST_START, l_dataSize, l_data);
+			game::util::SEND(room->players[1], E_PROTOCOL::MULTI_GUEST_START, l_dataSize, l_data);
 		}
 	}
 	return;
@@ -291,10 +267,12 @@ void GameManager::PlayTypeProcess(Session* _session)
 
 void GameManager::PlayerSpawnProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+#pragma endregion
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	l_dataSize = PlayerSpawnDataMake(l_data, *room);
@@ -303,23 +281,23 @@ void GameManager::PlayerSpawnProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::PLAYER_SPAWN), l_dataSize, l_data))
-		{
-			LogManager::GetInstance()->LogWrite(1005);
-		}
+		game::util::SEND(player, E_PROTOCOL::PLAYER_SPAWN, l_dataSize, l_data);
 	}
 	return;
 }
 
 void GameManager::PlayerTransformProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
 	PlayerTransformData moveData;
-	PlayerTransformDataSplit(_session->GetDataField(), moveData);
+	l_stream->DataPacketSplit(_session->GetDataField(), moveData);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
@@ -328,108 +306,102 @@ void GameManager::PlayerTransformProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::PLAYER_TRANSFORM), l_dataSize, l_data))
-		{
-			LogManager::GetInstance()->LogWrite(1006);
-		}
+		game::util::SEND(player, E_PROTOCOL::PLAYER_TRANSFORM, l_dataSize, l_data);
 	}
 	return;
 }
 
 void GameManager::PlayerJumpProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
-
-
 	MyStream l_stream;
-	l_stream->SetStream(_session->GetDataField());
+#pragma endregion
 
 	int idData;
-	l_stream->ReadInt(&idData);
+	l_stream->DataPacketSplit(_session->GetDataField(), idData);
 
-	l_dataSize = PlayerJumpDataMake(l_data, idData);
+	l_dataSize = l_stream->DataPacketMake(l_data, idData);
+
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
 
 	for (auto player : room->players)
 	{
-		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::PLAYER_JUMP), l_dataSize, l_data))
-		{
-			LogManager::GetInstance()->LogWrite(1006);
-		}
+		game::util::SEND(player, E_PROTOCOL::PLAYER_JUMP, l_dataSize, l_data);
 	}
 	return;
 }
 
 void GameManager::PlayerDodgeProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
-
-
 	MyStream l_stream;
-	l_stream->SetStream(_session->GetDataField());
+#pragma endregion
 
 	int idData;
-	l_stream->ReadInt(&idData);
+	l_stream->DataPacketSplit(_session->GetDataField(), idData);
 
-	l_dataSize = PlayerDodgeDataMake(l_data, idData);
+	l_dataSize = l_stream->DataPacketMake(l_data, idData);
+
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
 
 	for (auto player : room->players)
 	{
-		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::PLAYER_DODGE), l_dataSize, l_data))
-		{
-			LogManager::GetInstance()->LogWrite(1006);
-		}
+		game::util::SEND(player, E_PROTOCOL::PLAYER_DODGE, l_dataSize, l_data);
 	}
 	return;
 }
 
 void GameManager::PlayerFireProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
 	PlayerFireData l_packet;
-	PlayerFireDataSplit(_session->GetDataField(), l_packet);
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
 
-	l_dataSize = PlayerFireDataMake(l_data, l_packet);
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
 
 	for (auto player : room->players)
 	{
-		if (!player->SendPacket(static_cast<int>(E_PROTOCOL::PLAYER_FIRE), l_dataSize, l_data))
-		{
-			LogManager::GetInstance()->LogWrite(1006);
-		}
+		game::util::SEND(player, E_PROTOCOL::PLAYER_FIRE, l_dataSize, l_data);
 	}
 	return;
 }
 
 void GameManager::NpcSpawnProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey);
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
 	NpcSpawnData l_packet;
-	NpcSpawnDataSplit(_session->GetDataField(), l_packet);
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
 
-	l_dataSize = NpcSpawnDataMake(l_data, l_packet);
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
@@ -438,26 +410,25 @@ void GameManager::NpcSpawnProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::NPC_SPAWN), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1006);
-			}
-			break;
+			game::util::SEND(player, E_PROTOCOL::NPC_SPAWN, l_dataSize, l_data);
 		}
 	}
 }
 
 void GameManager::NpcTransformProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey);
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
 	NpcTransformData l_packet;
-	NpcTransformDataSplit(_session->GetDataField(), l_packet);
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
 
-	l_dataSize = NpcTransformDataMake(l_data, l_packet);
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
@@ -466,26 +437,25 @@ void GameManager::NpcTransformProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::NPC_TRANSFORM), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1006);
-			}
-			break;
+			game::util::SEND(player, E_PROTOCOL::NPC_TRANSFORM, l_dataSize, l_data);
 		}
 	}
 }
 
 void GameManager::NpcUpdateHpProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey);
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
 	NpcHpData l_packet;
-	NpcUpdateHpDataSplit(_session->GetDataField(), l_packet);
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
 
-	l_dataSize = NpcUpdateHpDataMake(l_data, l_packet);
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
@@ -494,26 +464,25 @@ void GameManager::NpcUpdateHpProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::NPC_UPDATEHP), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1006);
-			}
-			break;
+			game::util::SEND(player, E_PROTOCOL::NPC_UPDATEHP, l_dataSize, l_data);
 		}
 	}
 }
 
 void GameManager::NpcTriggerProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
 	NpcTriggerData l_packet;
-	NpcTriggerDataSplit(_session->GetDataField(), l_packet);
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
 
-	l_dataSize = NpcTriggerDataMake(l_data, l_packet);
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
@@ -522,11 +491,7 @@ void GameManager::NpcTriggerProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::NPC_TRIGGER), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1006);
-			}
-			break;
+			game::util::SEND(player, E_PROTOCOL::NPC_TRIGGER, l_dataSize, l_data);
 		}
 	}
 	return;
@@ -534,15 +499,18 @@ void GameManager::NpcTriggerProcess(Session* _session)
 
 void GameManager::NpcSkillProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey); // 잠금
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
 	NpcSkillData l_packet;
-	NpcSkillDataSplit(_session->GetDataField(), l_packet);
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
 
-	l_dataSize = NpcSkillDataMake(l_data, l_packet);
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
@@ -551,11 +519,7 @@ void GameManager::NpcSkillProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::NPC_SKILL), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1006);
-			}
-			break;
+			game::util::SEND(player, E_PROTOCOL::NPC_SKILL, l_dataSize, l_data);
 		}
 	}
 	return;
@@ -563,15 +527,18 @@ void GameManager::NpcSkillProcess(Session* _session)
 
 void GameManager::ItemSpawnProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey);
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
 	ItemSpawnData l_packet;
-	ItemSpawnDataSplit(_session->GetDataField(), l_packet);
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
 
-	l_dataSize = ItemSpawnDataMake(l_data, l_packet);
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
@@ -580,26 +547,25 @@ void GameManager::ItemSpawnProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::ITEM_SPAWN), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1006);
-			}
-			break;
+			game::util::SEND(player, E_PROTOCOL::ITEM_SPAWN, l_dataSize, l_data);
 		}
 	}
 }
 
 void GameManager::ItemDeSpawnProcess(Session* _session)
 {
-	LockGuard l_lockGuard(&m_criticalKey);
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
 
 	ItemDeSpawnData l_packet;
-	ItemDeSpawnDataSplit(_session->GetDataField(), l_packet);
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
 
-	l_dataSize = ItemDeSpawnDataMake(l_data, l_packet);
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
@@ -608,11 +574,7 @@ void GameManager::ItemDeSpawnProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			if (!player->SendPacket(static_cast<int>(E_PROTOCOL::ITEM_DESPAWN), l_dataSize, l_data))
-			{
-				LogManager::GetInstance()->LogWrite(1006);
-			}
-			break;
+			game::util::SEND(player, E_PROTOCOL::ITEM_DESPAWN, l_dataSize, l_data);
 		}
 	}
 }
@@ -637,14 +599,13 @@ int GameManager::ExitDataMake(BYTE* _data, int _id)
 }
 
 int GameManager::PlayerSpawnDataMake(BYTE* _data, Room& _room)
-{
+{// 씀
 	MyStream l_stream;
 	l_stream->SetStream(_data);
 
 	l_stream->WriteInt(static_cast<int>(_room.players.size()));
 	for (auto player : _room.players)
 	{
-		LogManager::GetInstance()->LogWrite(player->GetIdNumber());
 		l_stream->WriteInt(player->GetIdNumber());
 	}
 
@@ -656,7 +617,6 @@ int GameManager::PlayerTransformDataMake(BYTE* _data, PlayerTransformData _playe
 	MyStream l_stream;
 	l_stream->SetStream(_data);
 
-	// 2후보
 	l_stream->WriteBytes(reinterpret_cast<BYTE*>(&_playerTransformData), sizeof(PlayerTransformData));
 
 	return l_stream->GetLength();
