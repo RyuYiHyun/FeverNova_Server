@@ -95,9 +95,6 @@ void GameManager::Function(Session* _session)
 	case GameManager::E_PROTOCOL::NPC_SKILL:
 		NpcSkillProcess(_session);
 		break;
-	case GameManager::E_PROTOCOL::NPC_SKILL_TICKRATE:
-		NpcSkillTickrateProcess(_session);
-		break;
 	case GameManager::E_PROTOCOL::ITEM_SPAWN:
 		ItemSpawnProcess(_session);
 		break;
@@ -523,33 +520,6 @@ void GameManager::NpcSkillProcess(Session* _session)
 		if (_session != player)
 		{
 			game::util::SEND(player, E_PROTOCOL::NPC_SKILL, l_dataSize, l_data);
-		}
-	}
-	return;
-}
-
-void GameManager::NpcSkillTickrateProcess(Session* _session)
-{
-#pragma region ProcessSetting
-	LockGuard l_lockGuard(&m_criticalKey); // LOCK
-	BYTE l_data[BUFSIZE];
-	ZeroMemory(l_data, BUFSIZE);
-	int l_dataSize = -1;
-	MyStream l_stream;
-#pragma endregion
-	IntData l_packet;
-	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
-
-	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
-
-	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
-	if (room == nullptr) { return; }// ¿¹¿Ü
-
-	for (auto player : room->players)
-	{
-		if (_session != player)
-		{
-			game::util::SEND(player, E_PROTOCOL::NPC_SKILL_TICKRATE, l_dataSize, l_data);
 		}
 	}
 	return;

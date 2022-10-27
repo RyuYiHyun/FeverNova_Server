@@ -56,7 +56,6 @@ public:
 		// JY : Replace
 		// jjch PROTOCOL - REMOTE_ATTACK
 		NPC_SKILL,
-		NPC_SKILL_TICKRATE,
 
 		ITEM_SPAWN,
 		ITEM_DESPAWN,
@@ -80,7 +79,6 @@ public:
 	void NpcUpdateHpProcess(Session* _session);
 	void NpcTriggerProcess(Session* _session);
 	void NpcSkillProcess(Session* _session);
-	void NpcSkillTickrateProcess(Session* _session);
 
 	void ItemSpawnProcess(Session* _session);
 	void ItemDeSpawnProcess(Session* _sesison);
