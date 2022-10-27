@@ -178,4 +178,17 @@ struct ItemDeSpawnData
 	int m_playerID;
 	int m_itemID;
 };
+
+struct PcHitData//kjb 추가
+{
+	int m_shooterType;
+	int m_playerID;
+	int m_playerHP;
+};
+
+struct DoorUseData//kjb 추가
+{
+	int m_doorID;
+	float m_position_Y;
+};
 #pragma pack(pop)

@@ -33,6 +33,7 @@ public:
 		if (!isfull) // 방이 가득 찬지 여부 확인
 		{
 			players.push_back(player);
+			startCheck.push_back(false);
 			if (type == Type::Single)
 			{
 				if (players.size() >= 1)
@@ -58,6 +59,7 @@ public:
 		{
 			if (players[i] == player)
 			{
+				startCheck.erase(startCheck.begin() + i);
 				players.erase(players.begin() + i);
 				return true;
 			}
@@ -70,7 +72,5 @@ public:
 	Room::State state;		// 방 상태 정보
 	Type type;
 	vector<Session*> players;
+	vector<bool> startCheck;
 };
-
-
-
