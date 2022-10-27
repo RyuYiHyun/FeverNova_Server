@@ -1,4 +1,9 @@
 #pragma pack (push, 1)
+struct IntData
+{
+	int m_int;
+};
+
 struct Vector2
 {
 	Vector2() { X = 0; Y = 0; }
@@ -93,6 +98,12 @@ struct NpcTransformData
 	int m_objectID;
 	Vector3 m_position;
 	Quaternion m_rotation;
+};
+
+struct NpcTransformListData
+{
+	int m_size;
+	NpcTransformData m_npcTransformListData[50];
 };
 
 struct NpcHpData
