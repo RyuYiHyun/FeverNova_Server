@@ -1,1 +1,2 @@
 D:\FN\FeverNova_Server\x64\Debug\IOCP_Server.exe
+D:\Repository\FEver_NOVA_Server\FeverNova_Server\x64\Debug\IOCP_Server.exe

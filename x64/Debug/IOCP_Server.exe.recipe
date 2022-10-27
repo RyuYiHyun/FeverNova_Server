@@ -2,18 +2,18 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\FN\FeverNova_Server\x64\Debug\IOCP_Server.exe</FullPath>
+      <FullPath>D:\Repository\FEver_NOVA_Server\FeverNova_Server\x64\Debug\IOCP_Server.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles>
     <ContentFile>
-      <FullPath>D:\FN\FeverNova_Server\ProtocolExtension.cpp</FullPath>
+      <FullPath>D:\Repository\FEver_NOVA_Server\FeverNova_Server\ProtocolExtension.cpp</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>D:\FN\FeverNova_Server\ConsoleControlHandler.h</FullPath>
+      <FullPath>D:\Repository\FEver_NOVA_Server\FeverNova_Server\ConsoleControlHandler.h</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>D:\FN\FeverNova_Server\DataBaseManager.h</FullPath>
+      <FullPath>D:\Repository\FEver_NOVA_Server\FeverNova_Server\DataBaseManager.h</FullPath>
     </ContentFile>
   </ContentFiles>
   <SatelliteDlls />
