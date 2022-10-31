@@ -107,6 +107,15 @@ void GameManager::Function(Session* _session)
 	case GameManager::E_PROTOCOL::Door_Use:
 		DoorUseProcess(_session);
 		break;
+	case GameManager::E_PROTOCOL::REQESTION_SHOW:
+		ReqestionShowProcess(_session);
+		break;
+	case GameManager::E_PROTOCOL::REQESTION_YES:
+		ReqestionYesProcess(_session);
+		break;
+	case GameManager::E_PROTOCOL::REQESTION_NO:
+		ReqestionNoProcess(_session);
+		break;
 	default:
 		LogManager::GetInstance()->LogWrite(7777);
 		break;
@@ -581,6 +590,73 @@ void GameManager::ItemDeSpawnProcess(Session* _session)
 		if (_session != player)
 		{
 			game::util::SEND(player, E_PROTOCOL::ITEM_DESPAWN, l_dataSize, l_data);
+		}
+	}
+}
+
+void GameManager::ReqestionShowProcess(Session* _session)
+{
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
+	BYTE l_data[BUFSIZE];
+	ZeroMemory(l_data, BUFSIZE);
+	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
+
+	l_dataSize = 0;
+
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+	if (room == nullptr) { return; }// 예외
+
+	for (auto player : room->players)
+	{
+		if (_session != player)
+		{
+			game::util::SEND(player, E_PROTOCOL::REQESTION_SHOW, l_dataSize, l_data);
+		}
+	}
+}
+void GameManager::ReqestionYesProcess(Session* _session)
+{
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
+	BYTE l_data[BUFSIZE];
+	ZeroMemory(l_data, BUFSIZE);
+	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
+
+	l_dataSize = 0;
+
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+	if (room == nullptr) { return; }// 예외
+
+	for (auto player : room->players)
+	{
+		game::util::SEND(player, E_PROTOCOL::REQESTION_YES, l_dataSize, l_data);
+	}
+}
+void GameManager::ReqestionNoProcess(Session* _session)
+{
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
+	BYTE l_data[BUFSIZE];
+	ZeroMemory(l_data, BUFSIZE);
+	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
+
+	l_dataSize = 0;
+
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+	if (room == nullptr) { return; }// 예외
+
+	for (auto player : room->players)
+	{
+		if (_session != player)
+		{
+			game::util::SEND(player, E_PROTOCOL::REQESTION_NO, l_dataSize, l_data);
 		}
 	}
 }

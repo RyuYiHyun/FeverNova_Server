@@ -60,6 +60,11 @@ public:
 		REPLAY_REPLY,
 		ROADCOMPLETE,
 		REPLAY_START,
+		//jjch
+		REQESTION_SHOW,
+		REQESTION_YES,
+		REQESTION_NO,
+		GOMAIN
 	};
 
 	void Function(Session* _session);
@@ -81,6 +86,10 @@ public:
 
 	void ItemSpawnProcess(Session* _session);
 	void ItemDeSpawnProcess(Session* _sesison);
+
+	void ReqestionShowProcess(Session* _session);
+	void ReqestionYesProcess(Session* _session);
+	void ReqestionNoProcess(Session* _session);
 
 	void PcHitProcess(Session* _session);
 	void DoorUseProcess(Session* _sesison);
