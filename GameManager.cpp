@@ -612,7 +612,12 @@ void GameManager::ReqestionShowProcess(Session* _session)
 	MyStream l_stream;
 #pragma endregion
 
-	l_dataSize = 0;
+	// JJCH -------------------------------------------------------
+	ReqestionUIData l_packet;
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
+
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
+	// ------------------------------------------------------------
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
@@ -635,7 +640,12 @@ void GameManager::ReqestionYesProcess(Session* _session)
 	MyStream l_stream;
 #pragma endregion
 
-	l_dataSize = 0;
+	// JJCH -------------------------------------------------------
+	int l_packet;
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
+
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
+	// ------------------------------------------------------------
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
@@ -655,7 +665,12 @@ void GameManager::ReqestionNoProcess(Session* _session)
 	MyStream l_stream;
 #pragma endregion
 
-	l_dataSize = 0;
+	// JJCH -------------------------------------------------------
+	int l_packet;
+	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
+
+	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
+	// ------------------------------------------------------------
 
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외

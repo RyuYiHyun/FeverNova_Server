@@ -191,4 +191,12 @@ struct DoorUseData//kjb Ãß°¡
 	int m_doorID;
 	float m_position_Y;
 };
+
+// JJCH ---------------------
+struct ReqestionUIData
+{
+	int m_reqestionKind;
+	int m_beforeSceneKind;
+};
+// ---------------------------
 #pragma pack(pop)
