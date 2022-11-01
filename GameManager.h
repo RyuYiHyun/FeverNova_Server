@@ -55,11 +55,15 @@ public:
 		//kjb
 		PC_HIT,
 		Door_Use,
-		//RYU
-		REPLAY_REQUEST,
-		REPLAY_REPLY,
-		ROADCOMPLETE,
-		REPLAY_START,
+
+		// JJCH Ryu씨 프로토콜 사용 안하므로 삭제
+
+		//jjch
+		REQESTION_SHOW,
+		REQESTION_YES,
+		REQESTION_NO,
+		GOMAIN,
+		LOAD_COMPLETE
 	};
 
 	void Function(Session* _session);
@@ -82,15 +86,22 @@ public:
 	void ItemSpawnProcess(Session* _session);
 	void ItemDeSpawnProcess(Session* _sesison);
 
+	void ReqestionShowProcess(Session* _session);
+	void ReqestionYesProcess(Session* _session);
+	void ReqestionNoProcess(Session* _session);
+
 	void PcHitProcess(Session* _session);
 	void DoorUseProcess(Session* _sesison);
 
 	void ExitProcess(Session* _session);
 	void ForceExitProcess(Session* _session);
 
-	void ReplayRequestProcess(Session* _session);
-	void ReplyProcess(Session* _session);
-	void RoadCompleteProcess(Session* _session);
+	// JJCH Ryu씨가 만든 프로세스 안쓰므로 삭제
+
+	// JJCH -----------------------------------
+	void GoMainProcess(Session* _session);
+	void LoadCompleteProcess(Session* _session);
+	// -----------------------------------------
 
 #pragma region Packing&Unpacking
 	// packing

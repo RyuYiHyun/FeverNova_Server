@@ -33,7 +33,6 @@ public:
 		if (!isfull) // 방이 가득 찬지 여부 확인
 		{
 			players.push_back(player);
-			startCheck.push_back(false);
 			if (type == Type::Single)
 			{
 				if (players.size() >= 1)
@@ -59,7 +58,11 @@ public:
 		{
 			if (players[i] == player)
 			{
-				startCheck.erase(startCheck.begin() + i);
+				// JJCH ----------------------------------------------
+				// exit process에서 session의 room이 쓰레기값으로 남아있어서
+				// (room != nullptr)에 걸리지 않으므로 nullptr로 초기화해줌
+				players[i]->SetRoom(nullptr);
+				// -----------------------------------------------------
 				players.erase(players.begin() + i);
 				return true;
 			}
@@ -72,5 +75,7 @@ public:
 	Room::State state;		// 방 상태 정보
 	Type type;
 	vector<Session*> players;
-	vector<bool> startCheck;
+	// JJCH 이름 바꾸기 ----------------------------------------
+	int loadCompleteCount = 0;
+	// --------------------------------------------------------
 };
