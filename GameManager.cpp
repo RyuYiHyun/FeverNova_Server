@@ -62,6 +62,9 @@ void GameManager::Function(Session* _session)
 	case GameManager::E_PROTOCOL::PLAYTYPE:
 		PlayTypeProcess(_session);
 		break;
+	case GameManager::E_PROTOCOL::PLAYTYPE2:
+		PlayType2Process(_session);
+		break;
 	case GameManager::E_PROTOCOL::EXIT:
 		ExitProcess(_session);
 		break;
@@ -116,14 +119,14 @@ void GameManager::Function(Session* _session)
 	case GameManager::E_PROTOCOL::REQESTION_NO:
 		ReqestionNoProcess(_session);
 		break;
-	// JJCH -------------------------------------------
+		// JJCH -------------------------------------------
 	case GameManager::E_PROTOCOL::GOMAIN:
 		GoMainProcess(_session);
 		break;
 	case GameManager::E_PROTOCOL::LOAD_COMPLETE:
 		LoadCompleteProcess(_session);
 		break;
-	// --------------------------------------------------
+		// --------------------------------------------------
 	default:
 		LogManager::GetInstance()->LogWrite(7777);
 		break;
@@ -268,7 +271,7 @@ void GameManager::PlayTypeProcess(Session* _session)
 	{
 		Room* room;
 		room = RoomManager::GetInstance()->FindEmptyRoom();
-		if (room == nullptr)
+		if (room == nullptr)// 빈 방이없다
 		{
 			room = RoomManager::GetInstance()->CreateRoom(Room::Type::Multi);
 			room->enterPlayer(_session);
@@ -287,6 +290,67 @@ void GameManager::PlayTypeProcess(Session* _session)
 	}
 	return;
 }
+
+void GameManager::PlayType2Process(Session* _session)
+{
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
+	BYTE l_data[BUFSIZE];
+	ZeroMemory(l_data, BUFSIZE);
+	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
+
+	int select;
+	l_stream->DataPacketSplit(_session->GetDataField(), select);
+	l_dataSize = 0;
+
+	if (select == 1)   // 1P
+	{
+		Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+		room->state = Room::State::SINGLEPLAY;
+		// 게임 시작 메세지
+		game::util::SEND(room->players[0], E_PROTOCOL::SINGLE_START, l_dataSize, l_data);
+	}
+	else if (select == 2) // 2P
+	{
+		Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+
+		// 1 상황 - 호스트 wait  게스트 둘다에게 보내기
+		// 2 상황 - 게스트 wait  호스트 둘다에게 보내기
+
+		if(room->players[0] == _session)// 호스트
+		{
+			if(room->state == Room::State::WAIT_REORNEXT)
+			{// 나중
+				room->state = Room::State::MULTIPLAY;
+				game::util::SEND(room->players[0], E_PROTOCOL::MULTI_HOST_START, l_dataSize, l_data);
+				game::util::SEND(room->players[1], E_PROTOCOL::MULTI_GUEST_START, l_dataSize, l_data);
+			}
+			else
+			{//먼저
+				room->state = Room::State::WAIT_REORNEXT;
+				game::util::SEND(room->players[0], E_PROTOCOL::WAIT, l_dataSize, l_data);
+			}
+		}
+		else if(room->players[1] == _session)// 게스트
+		{
+			if (room->state == Room::State::WAIT_REORNEXT)
+			{// 나중
+				room->state = Room::State::MULTIPLAY;
+				game::util::SEND(room->players[0], E_PROTOCOL::MULTI_HOST_START, l_dataSize, l_data);
+				game::util::SEND(room->players[1], E_PROTOCOL::MULTI_GUEST_START, l_dataSize, l_data);
+			}
+			else
+			{//먼저
+				room->state = Room::State::WAIT_REORNEXT;
+				game::util::SEND(room->players[1], E_PROTOCOL::WAIT, l_dataSize, l_data);
+			}
+		}
+	}
+	return;
+}
+
 
 void GameManager::PlayerSpawnProcess(Session* _session)
 {

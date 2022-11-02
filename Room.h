@@ -10,6 +10,7 @@ public:
 		WAITSTART,		// 대기자 대기 상태
 		SINGLEPLAY,		// 1명 인원 게임 시작
 		MULTIPLAY,		// 2명 인원 게임 시작
+		WAIT_REORNEXT,			// 다시하기 대기 및 다음 스테이지 대기
 		ENDGAME,		// 게임의 단판의 결과가 나와 게임을 종료하는 상태
 	};
 	enum Type
@@ -37,6 +38,7 @@ public:
 			{
 				if (players.size() >= 1)
 				{
+					state = State::SINGLEPLAY;
 					isfull = true;
 				}
 			}
@@ -44,6 +46,7 @@ public:
 			{
 				if (players.size() >= 2)
 				{
+					state = State::MULTIPLAY;
 					isfull = true;
 				}
 			}
@@ -58,11 +61,7 @@ public:
 		{
 			if (players[i] == player)
 			{
-				// JJCH ----------------------------------------------
-				// exit process에서 session의 room이 쓰레기값으로 남아있어서
-				// (room != nullptr)에 걸리지 않으므로 nullptr로 초기화해줌
-				players[i]->SetRoom(nullptr);
-				// -----------------------------------------------------
+				state = State::ENDGAME;
 				players.erase(players.begin() + i);
 				return true;
 			}
@@ -75,6 +74,7 @@ public:
 	Room::State state;		// 방 상태 정보
 	Type type;
 	vector<Session*> players;
+
 	// JJCH 이름 바꾸기 ----------------------------------------
 	int loadCompleteCount = 0;
 	// --------------------------------------------------------

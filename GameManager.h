@@ -29,10 +29,14 @@ public:
 		IDCREATE,       // ���̵� ����
 
 		PLAYTYPE,       // ��Ƽ or �̱� ����
+		PLAYTYPE2,		// 다시하기와 다음 스테이지 (클라연동 해주기!)
 		WAIT,           // ��Ƽ ���
 		SINGLE_START,           // �̱� ����
 		MULTI_HOST_START,       // ȣ��Ʈ(��ü) ����
 		MULTI_GUEST_START,      // �Խ�Ʈ(����) ����
+
+		
+
 
 		LEAVE,
 		EXIT,
@@ -70,6 +74,7 @@ public:
 
 	void IdCreateProcess(Session* _session);
 	void PlayTypeProcess(Session* _session);
+	void PlayType2Process(Session* _session);
 
 	void PlayerSpawnProcess(Session* _session);
 	void PlayerTransformProcess(Session* _session);
