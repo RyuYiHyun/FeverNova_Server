@@ -67,7 +67,8 @@ public:
 		REQESTION_YES,
 		REQESTION_NO,
 		GOMAIN,
-		LOAD_COMPLETE
+		LOAD_COMPLETE,
+		NPC_SPAWNCOUNT
 	};
 
 	void Function(Session* _session);
@@ -106,6 +107,7 @@ public:
 	// JJCH -----------------------------------
 	void GoMainProcess(Session* _session);
 	void LoadCompleteProcess(Session* _session);
+	void NpcSpawnCountProcess(Session* _session);
 	// -----------------------------------------
 
 #pragma region Packing&Unpacking

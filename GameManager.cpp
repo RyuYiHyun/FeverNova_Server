@@ -126,6 +126,9 @@ void GameManager::Function(Session* _session)
 	case GameManager::E_PROTOCOL::LOAD_COMPLETE:
 		LoadCompleteProcess(_session);
 		break;
+	case GameManager::E_PROTOCOL::NPC_SPAWNCOUNT:
+		NpcSpawnCountProcess(_session);
+		break;
 		// --------------------------------------------------
 	default:
 		LogManager::GetInstance()->LogWrite(7777);
@@ -792,6 +795,34 @@ void GameManager::LoadCompleteProcess(Session* _session)
 		}
 	}
 }
+
+// JJCH ------------------------------------------------------------------------------
+void GameManager::NpcSpawnCountProcess(Session* _session)
+{
+#pragma region ProcessSetting
+	LockGuard l_lockGuard(&m_criticalKey); // LOCK
+	BYTE l_data[BUFSIZE];
+	ZeroMemory(l_data, BUFSIZE);
+	int l_dataSize = -1;
+	MyStream l_stream;
+#pragma endregion
+	int l_spawnCount = 0;
+	l_stream->DataPacketSplit(_session->GetDataField(), l_spawnCount);
+
+	l_dataSize = l_stream->DataPacketMake(l_data, l_spawnCount);
+
+	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
+	if (room == nullptr) { return; }// ¿¹¿Ü
+
+	for (auto player : room->players)
+	{
+		if (_session != player)
+		{
+			game::util::SEND(player, E_PROTOCOL::NPC_SPAWNCOUNT, l_dataSize, l_data);
+		}
+	}
+}
+// ---------------------------------------------------------------------------------------
 
 void GameManager::PcHitProcess(Session* _session)
 {
