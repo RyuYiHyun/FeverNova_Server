@@ -109,13 +109,15 @@ struct NpcTransformListData
 struct NpcHpData
 {
 	NpcHpData() {}
-	NpcHpData(int _objectID, int _currentHP)
+	NpcHpData(int _objectID, int _currentHP, int _lastAttackedPlayerID)
 	{
 		m_objectID = _objectID;
 		m_currentHP = _currentHP;
+		m_lastAttackedPlayerID = _lastAttackedPlayerID;
 	}
 	int m_objectID;
 	int m_currentHP;
+	int m_lastAttackedPlayerID;
 };
 
 struct NpcTriggerData
