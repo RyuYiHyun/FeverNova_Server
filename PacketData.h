@@ -201,4 +201,10 @@ struct ReqestionUIData
 	int m_beforeSceneKind;
 };
 // ---------------------------
+
+struct PlayerRunParticleChangeData//kjb 22.11.11
+{
+	int m_playerID;
+	int m_paticleIndex;
+};
 #pragma pack(pop)

@@ -35,9 +35,6 @@ public:
 		MULTI_HOST_START,       // ȣ��Ʈ(��ü) ����
 		MULTI_GUEST_START,      // �Խ�Ʈ(����) ����
 
-		
-
-
 		LEAVE,
 		EXIT,
 
@@ -68,7 +65,9 @@ public:
 		REQESTION_NO,
 		GOMAIN,
 		LOAD_COMPLETE,
-		NPC_SPAWNCOUNT
+		NPC_SPAWNCOUNT,
+
+		PLAYER_RUN_EFFECT_CHANGE//kjb 22.11.11
 	};
 
 	void Function(Session* _session);
@@ -98,6 +97,8 @@ public:
 
 	void PcHitProcess(Session* _session);
 	void DoorUseProcess(Session* _sesison);
+
+	void PlayerRunParticleChangeProcess(Session* _sesison);
 
 	void ExitProcess(Session* _session);
 	void ForceExitProcess(Session* _session);
