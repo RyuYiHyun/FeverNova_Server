@@ -1,2 +1,0 @@
-E:\KoreaIt\Github Clone\FN_S\x64\Debug\IOCP_Server.exe
-D:\gameprg3B\Unity\fork\FeverNova_Server\x64\Debug\IOCP_Server.exe
