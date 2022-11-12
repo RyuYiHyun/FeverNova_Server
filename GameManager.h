@@ -63,7 +63,10 @@ public:
 		REQESTION_SHOW,
 		REQESTION_YES,
 		REQESTION_NO,
-		GOMAIN,
+		RESULT_SHOW,
+
+		MAIN_GOMAIN,
+		MAIN_LEAVE,
 		LOAD_COMPLETE,
 		NPC_SPAWNCOUNT,
 
@@ -94,6 +97,7 @@ public:
 	void ReqestionShowProcess(Session* _session);
 	void ReqestionYesProcess(Session* _session);
 	void ReqestionNoProcess(Session* _session);
+	void ResultShowProcess(Session* _session);
 
 	void PcHitProcess(Session* _session);
 	void DoorUseProcess(Session* _sesison);
@@ -107,6 +111,7 @@ public:
 
 	// JJCH -----------------------------------
 	void GoMainProcess(Session* _session);
+	void MainLeaveProcess(Session* _session);
 	void LoadCompleteProcess(Session* _session);
 	void NpcSpawnCountProcess(Session* _session);
 	// -----------------------------------------

@@ -90,17 +90,17 @@ void RoomManager::OutCheck(Session* player)
 			room->exitPlayer(player);
 			RemoveRoom(room);
 		}
-		if (room->state == Room::State::SINGLEPLAY) // 게임중일때
+		else if (room->state == Room::State::SINGLEPLAY) // 게임중일때
 		{
 			room->exitPlayer(player);
 			RemoveRoom(room);
 		}
-		if (room->state == Room::State::MULTIPLAY) // 게임중일때
+		else if (room->state == Room::State::MULTIPLAY) // 게임중일때
 		{
 			room->exitPlayer(player);
 			RemoveRoom(room);
 		}
-		if (room->state == Room::State::ENDGAME) // 게임이 종료
+		else if (room->state == Room::State::ENDGAME) // 게임이 종료
 		{
 			room->exitPlayer(player);
 			RemoveRoom(room);

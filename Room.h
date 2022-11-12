@@ -63,6 +63,7 @@ public:
 			{
 				state = State::ENDGAME;
 				players.erase(players.begin() + i);
+				player->SetRoom(nullptr);
 				return true;
 			}
 		}
