@@ -934,10 +934,7 @@ void GameManager::PcHitProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		if (_session != player)
-		{
-			game::util::SEND(player, E_PROTOCOL::PC_HIT, l_dataSize, l_data);
-		}
+		game::util::SEND(player, E_PROTOCOL::PC_HIT, l_dataSize, l_data);
 	}
 }
 

@@ -183,9 +183,9 @@ struct ItemDeSpawnData
 
 struct PcHitData//kjb 추가
 {
-	int m_shooterType;
 	int m_playerID;
 	int m_playerHP;
+	int m_damage;
 };
 
 struct DoorUseData//kjb 추가
