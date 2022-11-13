@@ -1,6 +1,6 @@
 #pragma once
 #pragma warning(disable:4996)
-#pragma comment(lib, "libmysql.lib")
+//#pragma comment(lib, "libmysql.lib")
 
 //#pragma comment(lib, "ws2_32")
 //#include <winsock2.h>
