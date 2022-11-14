@@ -15,7 +15,7 @@ using namespace std;
 #define SERVERPORT	9000		
 #define BUFSIZE		4096
 #define INFOSIZE	128
-#define MAXPACKETNUM 210000000
+#define MAXPACKETNUM 2
 
 
 
