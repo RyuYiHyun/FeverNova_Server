@@ -1,7 +1,7 @@
 #pragma once
 #include "MemoryPool.h"
 
-class BaseStream : public MemoryPool<BaseStream>
+class BaseStream// : public MemoryPool<BaseStream>
 {
 public:
 	BaseStream();

@@ -116,6 +116,15 @@ public:
 	void NpcSpawnCountProcess(Session* _session);
 	// -----------------------------------------
 
+	bool SEND(Session* _session, GameManager::E_PROTOCOL _protocol, int _dataSize, BYTE* _data)
+	{
+		if (!_session->SendPacket((int)_protocol, _dataSize, _data))
+		{
+			LogManager::GetInstance()->LogWrite(1006);
+			return false;
+		}
+		return true;
+	}
 #pragma region Packing&Unpacking
 	// packing
 	int PlayerSpawnDataMake(BYTE* _data, Room& _room);
@@ -125,20 +134,4 @@ private:
 	CriticalKey m_criticalKey;
 	int m_giveIdCounter;
 	list<Session*> m_playerList;
-};
-namespace game
-{
-	class util
-	{
-	public:
-		static bool SEND(Session* _session, GameManager::E_PROTOCOL _protocol, int& _dataSize, BYTE* _data)
-		{
-			if (!_session->SendPacket(static_cast<int>(_protocol), _dataSize, _data))
-			{
-				LogManager::GetInstance()->LogWrite(1006);
-				return false;
-			}
-			return true;
-		}
-	};
 };

@@ -76,7 +76,7 @@ void MainManager::Release() // 第贸府
 	// 窍困 概聪历 缔沥府... (积己苞 开鉴)
 	GameManager::GetInstance()->Release();
 
-	BaseStream::ReleaseAllAllocedMemory();
+	//BaseStream::ReleaseAllAllocedMemory();
 
 	SessionManager::GetInstance()->Release();
 	//LoginManager::GetInstance()->Release();

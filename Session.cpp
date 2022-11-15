@@ -47,7 +47,7 @@ State* Session::GetState()
 
 
 #pragma region ÇÔ¼ö
-bool Session::SendPacket(unsigned int _protocol, unsigned int _datasize, BYTE* _data)
+bool Session::SendPacket(int _protocol, int _datasize, BYTE* _data)
 {
 	if (!Send(_protocol, _datasize, _data))
 	{

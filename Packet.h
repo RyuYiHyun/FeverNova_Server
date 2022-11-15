@@ -27,7 +27,7 @@ public:
 	virtual ~Packet();
 
 	// Send Funcs
-	bool Send(unsigned int _protocol, int _size, BYTE* _data, bool _flag = false);
+	bool Send(int _protocol, int _size, BYTE* _data, bool _flag = false);
 	E_RESULT SendCompleteCheck(int _cbTrans);
 
 	// Recv Func
@@ -55,5 +55,5 @@ private:
 
 	CriticalKey m_criticalKey;
 
-	void PacketDataAdd(unsigned int _protocol, int _dataSize, BYTE* _data, bool _flag);
+	void PacketDataAdd(int _protocol, int _dataSize, BYTE* _data, bool _flag);
 };

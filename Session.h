@@ -18,7 +18,7 @@ public:
 
 	//void SetLoginInfo(void* _loginInfo);
 
-	bool SendPacket(unsigned int _protocol, unsigned int _datasize, BYTE* _data);
+	bool SendPacket(int _protocol, int _datasize, BYTE* _data);
 	bool RecvPacket();
 	
 	void SetIdNumber(int _idNumber);

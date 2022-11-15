@@ -159,8 +159,8 @@ void GameManager::IdCreateProcess(Session* _session)
 	l_dataSize = l_stream->DataPacketMake(l_data, m_giveIdCounter);
 	m_playerList.push_back(_session);
 	m_giveIdCounter++;
-
-	game::util::SEND(_session, E_PROTOCOL::IDCREATE, l_dataSize, l_data);
+	assert((l_dataSize > 0));
+	SEND(_session, E_PROTOCOL::IDCREATE, l_dataSize, l_data);
 }
 
 void GameManager::ExitProcess(Session* _session)
@@ -184,15 +184,17 @@ void GameManager::ExitProcess(Session* _session)
 			if (player == _session)
 			{
 				RoomManager::GetInstance()->OutCheck(_session);
-				game::util::SEND(player, E_PROTOCOL::EXIT, l_dataSize, l_data);
+				assert((l_dataSize > 0));
+				SEND(player, E_PROTOCOL::EXIT, l_dataSize, l_data);
 				continue;
 			}
-			game::util::SEND(player, E_PROTOCOL::LEAVE, l_dataSize, l_data);
+			SEND(player, E_PROTOCOL::LEAVE, l_dataSize, l_data);
 		}
 	}
 	else
 	{
-		game::util::SEND(_session, E_PROTOCOL::EXIT, l_dataSize, l_data);
+		assert((l_dataSize > 0));
+		SEND(_session, E_PROTOCOL::EXIT, l_dataSize, l_data);
 	}
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); )
@@ -231,15 +233,18 @@ void GameManager::ForceExitProcess(Session* _session)
 			if (player == _session)
 			{
 				RoomManager::GetInstance()->OutCheck(_session);
-				game::util::SEND(player, E_PROTOCOL::EXIT, l_dataSize, l_data);
+				assert((l_dataSize > 0));
+				SEND(player, E_PROTOCOL::EXIT, l_dataSize, l_data);
 				continue;
 			}
-			game::util::SEND(player, E_PROTOCOL::LEAVE, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::LEAVE, l_dataSize, l_data);
 		}
 	}
 	else
 	{
-		game::util::SEND(_session, E_PROTOCOL::EXIT, l_dataSize, l_data);
+		assert((l_dataSize > 0));
+		SEND(_session, E_PROTOCOL::EXIT, l_dataSize, l_data);
 	}
 
 	for (list<Session*>::iterator iter = m_playerList.begin(); iter != m_playerList.end(); )
@@ -277,7 +282,7 @@ void GameManager::PlayTypeProcess(Session* _session)
 		room->enterPlayer(_session);
 		_session->SetRoom(room);
 		// 게임 시작 메세지
-		game::util::SEND(room->players[0], E_PROTOCOL::SINGLE_START, l_dataSize, l_data);
+		SEND(room->players[0], E_PROTOCOL::SINGLE_START, l_dataSize, l_data);
 	}
 	else if (select == 2) // 2P
 	{
@@ -289,15 +294,15 @@ void GameManager::PlayTypeProcess(Session* _session)
 			room->enterPlayer(_session);
 			_session->SetRoom(room);
 			// 게임 대기..................
-			game::util::SEND(room->players[0], E_PROTOCOL::WAIT, l_dataSize, l_data);
+			SEND(room->players[0], E_PROTOCOL::WAIT, l_dataSize, l_data);
 		}
 		else
 		{
 			room->enterPlayer(_session);
 			_session->SetRoom(room);
 			// 게임 시작..................
-			game::util::SEND(room->players[0], E_PROTOCOL::MULTI_HOST_START, l_dataSize, l_data);
-			game::util::SEND(room->players[1], E_PROTOCOL::MULTI_GUEST_START, l_dataSize, l_data);
+			SEND(room->players[0], E_PROTOCOL::MULTI_HOST_START, l_dataSize, l_data);
+			SEND(room->players[1], E_PROTOCOL::MULTI_GUEST_START, l_dataSize, l_data);
 		}
 	}
 	return;
@@ -322,7 +327,7 @@ void GameManager::PlayType2Process(Session* _session)
 		Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 		room->state = Room::State::SINGLEPLAY;
 		// 게임 시작 메세지
-		game::util::SEND(room->players[0], E_PROTOCOL::SINGLE_START, l_dataSize, l_data);
+		SEND(room->players[0], E_PROTOCOL::SINGLE_START, l_dataSize, l_data);
 	}
 	else if (select == 2) // 2P
 	{
@@ -336,13 +341,13 @@ void GameManager::PlayType2Process(Session* _session)
 			if (room->state == Room::State::WAIT_REORNEXT)
 			{// 나중
 				room->state = Room::State::MULTIPLAY;
-				game::util::SEND(room->players[0], E_PROTOCOL::MULTI_HOST_START, l_dataSize, l_data);
-				game::util::SEND(room->players[1], E_PROTOCOL::MULTI_GUEST_START, l_dataSize, l_data);
+				SEND(room->players[0], E_PROTOCOL::MULTI_HOST_START, l_dataSize, l_data);
+				SEND(room->players[1], E_PROTOCOL::MULTI_GUEST_START, l_dataSize, l_data);
 			}
 			else
 			{//먼저
 				room->state = Room::State::WAIT_REORNEXT;
-				game::util::SEND(room->players[0], E_PROTOCOL::WAIT, l_dataSize, l_data);
+				SEND(room->players[0], E_PROTOCOL::WAIT, l_dataSize, l_data);
 			}
 		}
 		else if (room->players[1] == _session)// 게스트
@@ -350,13 +355,13 @@ void GameManager::PlayType2Process(Session* _session)
 			if (room->state == Room::State::WAIT_REORNEXT)
 			{// 나중
 				room->state = Room::State::MULTIPLAY;
-				game::util::SEND(room->players[0], E_PROTOCOL::MULTI_HOST_START, l_dataSize, l_data);
-				game::util::SEND(room->players[1], E_PROTOCOL::MULTI_GUEST_START, l_dataSize, l_data);
+				SEND(room->players[0], E_PROTOCOL::MULTI_HOST_START, l_dataSize, l_data);
+				SEND(room->players[1], E_PROTOCOL::MULTI_GUEST_START, l_dataSize, l_data);
 			}
 			else
 			{//먼저
 				room->state = Room::State::WAIT_REORNEXT;
-				game::util::SEND(room->players[1], E_PROTOCOL::WAIT, l_dataSize, l_data);
+				SEND(room->players[1], E_PROTOCOL::WAIT, l_dataSize, l_data);
 			}
 		}
 	}
@@ -380,7 +385,8 @@ void GameManager::PlayerSpawnProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		game::util::SEND(player, E_PROTOCOL::PLAYER_SPAWN, l_dataSize, l_data);
+		assert((l_dataSize > 0));
+		SEND(player, E_PROTOCOL::PLAYER_SPAWN, l_dataSize, l_data);
 	}
 	return;
 }
@@ -405,7 +411,8 @@ void GameManager::PlayerTransformProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		game::util::SEND(player, E_PROTOCOL::PLAYER_TRANSFORM, l_dataSize, l_data);
+		assert((l_dataSize > 0));
+		SEND(player, E_PROTOCOL::PLAYER_TRANSFORM, l_dataSize, l_data);
 	}
 	return;
 }
@@ -431,7 +438,8 @@ void GameManager::PlayerJumpProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		game::util::SEND(player, E_PROTOCOL::PLAYER_JUMP, l_dataSize, l_data);
+		assert((l_dataSize > 0));
+		SEND(player, E_PROTOCOL::PLAYER_JUMP, l_dataSize, l_data);
 	}
 	return;
 }
@@ -457,7 +465,8 @@ void GameManager::PlayerDodgeProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		game::util::SEND(player, E_PROTOCOL::PLAYER_DODGE, l_dataSize, l_data);
+		assert((l_dataSize > 0));
+		SEND(player, E_PROTOCOL::PLAYER_DODGE, l_dataSize, l_data);
 	}
 	return;
 }
@@ -482,7 +491,8 @@ void GameManager::PlayerFireProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		game::util::SEND(player, E_PROTOCOL::PLAYER_FIRE, l_dataSize, l_data);
+		assert((l_dataSize > 0));
+		SEND(player, E_PROTOCOL::PLAYER_FIRE, l_dataSize, l_data);
 	}
 	return;
 }
@@ -509,7 +519,8 @@ void GameManager::NpcSpawnProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::NPC_SPAWN, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::NPC_SPAWN, l_dataSize, l_data);
 		}
 	}
 }
@@ -523,12 +534,21 @@ void GameManager::NpcTransformProcess(Session* _session)
 	int l_dataSize = -1;
 	MyStream l_stream;
 #pragma endregion
+	int l_listSize = 0;
+	l_stream->DataPacketSplit(_session->GetDataField(), l_listSize);
 
-	NpcTransformListData l_packet;
-	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
+	MyStream l_stream2;
+	l_stream2->SetStream(l_data);
+	l_stream2->WriteInt(l_listSize);
 
-	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
+	for (int i = 0; i < l_listSize; i++)
+	{
+		NpcTransformData temp;
+		l_stream->ReadBytes(reinterpret_cast<BYTE*>(&temp), sizeof(NpcTransformData));
+		l_stream2->WriteBytes(reinterpret_cast<BYTE*>(&temp), sizeof(NpcTransformData));
+	}
 
+	l_dataSize = l_stream2->GetLength();
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// 예외
 
@@ -536,7 +556,8 @@ void GameManager::NpcTransformProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::NPC_TRANSFORM, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::NPC_TRANSFORM, l_dataSize, l_data);
 		}
 	}
 }
@@ -563,7 +584,8 @@ void GameManager::NpcUpdateHpProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::NPC_UPDATEHP, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::NPC_UPDATEHP, l_dataSize, l_data);
 		}
 	}
 }
@@ -590,7 +612,8 @@ void GameManager::NpcTriggerProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::NPC_TRIGGER, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::NPC_TRIGGER, l_dataSize, l_data);
 		}
 	}
 	return;
@@ -618,7 +641,8 @@ void GameManager::NpcSkillProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::NPC_SKILL, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::NPC_SKILL, l_dataSize, l_data);
 		}
 	}
 	return;
@@ -646,7 +670,8 @@ void GameManager::ItemSpawnProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::ITEM_SPAWN, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::ITEM_SPAWN, l_dataSize, l_data);
 		}
 	}
 }
@@ -673,7 +698,8 @@ void GameManager::ItemDeSpawnProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::ITEM_DESPAWN, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::ITEM_DESPAWN, l_dataSize, l_data);
 		}
 	}
 }
@@ -702,7 +728,8 @@ void GameManager::ReqestionShowProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::REQESTION_SHOW, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::REQESTION_SHOW, l_dataSize, l_data);
 		}
 	}
 }
@@ -733,7 +760,8 @@ void GameManager::ReqestionYesProcess(Session* _session)
 		{
 			if (player != _session)
 			{
-				game::util::SEND(player, E_PROTOCOL::REQESTION_YES, l_dataSize, l_data);
+				assert((l_dataSize > 0));
+				SEND(player, E_PROTOCOL::REQESTION_YES, l_dataSize, l_data);
 			}
 		}
 	}
@@ -741,7 +769,8 @@ void GameManager::ReqestionYesProcess(Session* _session)
 	{
 		for (auto player : room->players)
 		{
-			game::util::SEND(player, E_PROTOCOL::REQESTION_YES, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::REQESTION_YES, l_dataSize, l_data);
 		}
 	}
 }
@@ -769,7 +798,8 @@ void GameManager::ReqestionNoProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::REQESTION_NO, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::REQESTION_NO, l_dataSize, l_data);
 		}
 	}
 }
@@ -798,7 +828,8 @@ void GameManager::ResultShowProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::RESULT_SHOW, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::RESULT_SHOW, l_dataSize, l_data);
 		}
 	}
 }
@@ -822,7 +853,7 @@ void GameManager::GoMainProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		game::util::SEND(player, E_PROTOCOL::MAIN_LEAVE, l_dataSize, l_data);
+		SEND(player, E_PROTOCOL::MAIN_LEAVE, l_dataSize, l_data);
 	}
 }
 
@@ -881,7 +912,7 @@ void GameManager::LoadCompleteProcess(Session* _session)
 
 		for (auto player : room->players)
 		{
-			game::util::SEND(player, E_PROTOCOL::LOAD_COMPLETE, l_dataSize, l_data);
+			SEND(player, E_PROTOCOL::LOAD_COMPLETE, l_dataSize, l_data);
 		}
 	}
 }
@@ -908,7 +939,8 @@ void GameManager::NpcSpawnCountProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::NPC_SPAWNCOUNT, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::NPC_SPAWNCOUNT, l_dataSize, l_data);
 		}
 	}
 }
@@ -934,7 +966,8 @@ void GameManager::PcHitProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		game::util::SEND(player, E_PROTOCOL::PC_HIT, l_dataSize, l_data);
+		assert((l_dataSize > 0));
+		SEND(player, E_PROTOCOL::PC_HIT, l_dataSize, l_data);
 	}
 }
 
@@ -960,7 +993,8 @@ void GameManager::DoorUseProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::Door_Use, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::Door_Use, l_dataSize, l_data);
 		}
 	}
 }
@@ -987,7 +1021,8 @@ void GameManager::PlayerRunParticleChangeProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			game::util::SEND(player, E_PROTOCOL::PLAYER_RUN_EFFECT_CHANGE, l_dataSize, l_data);
+			assert((l_dataSize > 0));
+			SEND(player, E_PROTOCOL::PLAYER_RUN_EFFECT_CHANGE, l_dataSize, l_data);
 		}
 	}
 }

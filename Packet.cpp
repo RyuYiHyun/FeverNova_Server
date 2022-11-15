@@ -70,7 +70,7 @@ int Packet::GetProtocol()
 
 
 #pragma region Send관련
-bool Packet::Send(unsigned int _protocol, int _size, BYTE* _data, bool _flag)
+bool Packet::Send(int _protocol, int _size, BYTE* _data, bool _flag)
 {
 	LockGuard l_lockGuard(&m_criticalKey);
 
@@ -129,6 +129,7 @@ void Packet::Decryption(int _dataSize, BYTE* _data)
 
 void Packet::InitCryptoKeySend(int _sendProtocol)
 {
+	LockGuard l_lockGuard(&m_criticalKey);
 	BYTE l_data[BUFSIZE];
 	ZeroMemory(l_data, BUFSIZE);
 
@@ -192,17 +193,24 @@ Packet::E_RESULT Packet::SendCompleteCheck(int _transferred)
 	return E_RESULT::FAIL;
 }
 
-void Packet::PacketDataAdd(unsigned int _protocol, int _dataSize, BYTE* _data, bool _flag)
+void Packet::PacketDataAdd(int _protocol, int _dataSize, BYTE* _data, bool _flag)
 {
+	LockGuard l_lockGuard(&m_criticalKey);
 	BYTE l_buf[BUFSIZE];
 	ZeroMemory(l_buf, BUFSIZE);
 
 	int l_dataSize = 0;
 	BYTE* l_focusPointer = l_buf + sizeof(int);
 
-	l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_dataSize, _protocol);
-	l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_dataSize, m_sendCount);
-	m_sendCount++;
+	memcpy(l_focusPointer, &_protocol, sizeof(int));
+	l_dataSize += sizeof(int);
+	l_focusPointer += sizeof(int);
+
+	memcpy(l_focusPointer, &m_sendCount, sizeof(int));
+	l_dataSize += sizeof(int);
+	l_focusPointer += sizeof(int);
+
+	//m_sendCount++;
 	if (m_sendCount > MAXPACKETNUM) // 패킷 넘버 돌리기
 	{
 		m_sendCount = 0;
@@ -218,7 +226,9 @@ void Packet::PacketDataAdd(unsigned int _protocol, int _dataSize, BYTE* _data, b
 
 	l_focusPointer = l_buf;
 
-	l_focusPointer = net::util::WriteToByteStream(l_focusPointer, l_dataSize, l_dataSize);
+	memcpy(l_focusPointer, &l_dataSize, sizeof(int));
+	l_dataSize += sizeof(int);
+	l_focusPointer += sizeof(int);
 
 	m_sendBuf.push(new PacketData(l_buf, l_dataSize));
 }
@@ -247,11 +257,9 @@ Packet::E_RESULT Packet::RecvCompleteCheck(int _transferred)
 
 			int l_packetNumber = 0;
 			BYTE* l_focusPointer = nullptr;
-
 			m_sizeFlag = false;
 			m_recvBuf.m_dataSize = sizeof(int); // 사이즈 받기
 			m_recvBuf.m_completeSize = 0;
-
 			l_focusPointer = m_recvBuf.m_data + sizeof(unsigned int);
 			memcpy(&l_packetNumber, l_focusPointer, sizeof(int));
 			if (l_packetNumber != m_recvCount)
@@ -259,7 +267,8 @@ Packet::E_RESULT Packet::RecvCompleteCheck(int _transferred)
 				LogManager::GetInstance()->LogWrite(5001);
 				return E_RESULT::PACKETNUM_MISMATCH;
 			}
-			m_recvCount++;
+			
+			//m_recvCount++;
 			if (m_recvCount > MAXPACKETNUM)
 			{
 				m_recvCount = 0;
