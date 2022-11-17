@@ -16,6 +16,3 @@ using namespace std;
 #define BUFSIZE		4096
 #define INFOSIZE	128
 #define MAXPACKETNUM 0
-
-
-

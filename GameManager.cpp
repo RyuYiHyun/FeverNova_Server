@@ -556,7 +556,6 @@ void GameManager::NpcTransformProcess(Session* _session)
 	{
 		if (_session != player)
 		{
-			assert((l_dataSize > 0));
 			SEND(player, E_PROTOCOL::NPC_TRANSFORM, l_dataSize, l_data);
 		}
 	}
