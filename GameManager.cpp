@@ -411,8 +411,11 @@ void GameManager::PlayerTransformProcess(Session* _session)
 
 	for (auto player : room->players)
 	{
-		assert((l_dataSize > 0));
-		SEND(player, E_PROTOCOL::PLAYER_TRANSFORM, l_dataSize, l_data);
+		if (player != _session)
+		{
+			SEND(player, E_PROTOCOL::PLAYER_TRANSFORM, l_dataSize, l_data);
+
+		}
 	}
 	return;
 }
