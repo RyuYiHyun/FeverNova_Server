@@ -1,5 +1,6 @@
 #pragma once
 #pragma warning(disable:4996)
+//JY1117
 //#pragma comment(lib, "libmysql.lib")
 
 //#pragma comment(lib, "ws2_32")
