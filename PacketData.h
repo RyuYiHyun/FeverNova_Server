@@ -73,15 +73,17 @@ struct PlayerFireData
 struct NpcSpawnData
 {
 	NpcSpawnData() {}
-	NpcSpawnData(int _objectID, int _monsterID, Vector3 _position)
+	NpcSpawnData(int _objectID, int _monsterID, Vector3 _position,int _isSummoned)
 	{
 		m_objectID = _objectID;
 		m_monsterID = _monsterID;
 		m_position = _position;
+		m_isSummoned = _isSummoned;
 	}
 	int m_objectID;
 	int m_monsterID;
 	Vector3 m_position;
+	int m_isSummoned;
 };
 
 // JY : Rename
