@@ -509,12 +509,21 @@ void GameManager::NpcSpawnProcess(Session* _session)
 	int l_dataSize = -1;
 	MyStream l_stream;
 #pragma endregion
+	int l_listSize = 0;
+	l_stream->DataPacketSplit(_session->GetDataField(), l_listSize);
 
-	NpcSpawnData l_packet;
-	l_stream->DataPacketSplit(_session->GetDataField(), l_packet);
+	MyStream l_stream2;
+	l_stream2->SetStream(l_data);
+	l_stream2->WriteInt(l_listSize);
 
-	l_dataSize = l_stream->DataPacketMake(l_data, l_packet);
+	for (int i = 0; i < l_listSize; i++)
+	{
+		NpcSpawnData temp;
+		l_stream->ReadBytes(reinterpret_cast<BYTE*>(&temp), sizeof(NpcSpawnData));
+		l_stream2->WriteBytes(reinterpret_cast<BYTE*>(&temp), sizeof(NpcSpawnData));
+	}
 
+	l_dataSize = l_stream2->GetLength();
 	Room* room = reinterpret_cast<Room*>(_session->GetRoom());
 	if (room == nullptr) { return; }// ¿¹¿Ü
 
